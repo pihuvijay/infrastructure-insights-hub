@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as EnvironmentsRouteImport } from './routes/environments'
+import { Route as ToolsRouteImport } from './routes/tools'
+import { Route as RcaIndexRouteImport } from './routes/rca.index'
+import { Route as RcaInsightsRouteImport } from './routes/rca.insights'
+import { Route as RcaUploadRouteImport } from './routes/rca.upload'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnvironmentsRoute = EnvironmentsRouteImport.update({
+  id: '/environments',
+  path: '/environments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RcaIndexRoute = RcaIndexRouteImport.update({
+  id: '/rca/',
+  path: '/rca/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RcaInsightsRoute = RcaInsightsRouteImport.update({
+  id: '/rca/insights',
+  path: '/rca/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RcaUploadRoute = RcaUploadRouteImport.update({
+  id: '/rca/upload',
+  path: '/rca/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/environments': typeof EnvironmentsRoute
+  '/tools': typeof ToolsRoute
+  '/rca/insights': typeof RcaInsightsRoute
+  '/rca/upload': typeof RcaUploadRoute
+  '/rca/': typeof RcaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/environments': typeof EnvironmentsRoute
+  '/tools': typeof ToolsRoute
+  '/rca/insights': typeof RcaInsightsRoute
+  '/rca/upload': typeof RcaUploadRoute
+  '/rca': typeof RcaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/environments': typeof EnvironmentsRoute
+  '/tools': typeof ToolsRoute
+  '/rca/insights': typeof RcaInsightsRoute
+  '/rca/upload': typeof RcaUploadRoute
+  '/rca/': typeof RcaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/environments'
+    | '/tools'
+    | '/rca/insights'
+    | '/rca/upload'
+    | '/rca/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/environments'
+    | '/tools'
+    | '/rca/insights'
+    | '/rca/upload'
+    | '/rca'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/environments'
+    | '/tools'
+    | '/rca/insights'
+    | '/rca/upload'
+    | '/rca/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  EnvironmentsRoute: typeof EnvironmentsRoute
+  ToolsRoute: typeof ToolsRoute
+  RcaInsightsRoute: typeof RcaInsightsRoute
+  RcaUploadRoute: typeof RcaUploadRoute
+  RcaIndexRoute: typeof RcaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/environments': {
+      id: '/environments'
+      path: '/environments'
+      fullPath: '/environments'
+      preLoaderRoute: typeof EnvironmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rca/': {
+      id: '/rca/'
+      path: '/rca'
+      fullPath: '/rca/'
+      preLoaderRoute: typeof RcaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rca/insights': {
+      id: '/rca/insights'
+      path: '/rca/insights'
+      fullPath: '/rca/insights'
+      preLoaderRoute: typeof RcaInsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rca/upload': {
+      id: '/rca/upload'
+      path: '/rca/upload'
+      fullPath: '/rca/upload'
+      preLoaderRoute: typeof RcaUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  EnvironmentsRoute: EnvironmentsRoute,
+  ToolsRoute: ToolsRoute,
+  RcaInsightsRoute: RcaInsightsRoute,
+  RcaUploadRoute: RcaUploadRoute,
+  RcaIndexRoute: RcaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
