@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EnvironmentsRouteImport } from './routes/environments'
 import { Route as ToolsRouteImport } from './routes/tools'
+import { Route as ApiAgentRouteImport } from './routes/api/agent'
 import { Route as RcaIndexRouteImport } from './routes/rca.index'
 import { Route as RcaInsightsRouteImport } from './routes/rca.insights'
 import { Route as RcaUploadRouteImport } from './routes/rca.upload'
@@ -37,6 +38,11 @@ const ToolsRoute = ToolsRouteImport.update({
   path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAgentRoute = ApiAgentRouteImport.update({
+  id: '/api/agent',
+  path: '/api/agent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RcaIndexRoute = RcaIndexRouteImport.update({
   id: '/rca/',
   path: '/rca/',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/environments': typeof EnvironmentsRoute
   '/tools': typeof ToolsRoute
+  '/api/agent': typeof ApiAgentRoute
   '/rca/insights': typeof RcaInsightsRoute
   '/rca/upload': typeof RcaUploadRoute
   '/rca/': typeof RcaIndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/environments': typeof EnvironmentsRoute
   '/tools': typeof ToolsRoute
+  '/api/agent': typeof ApiAgentRoute
   '/rca/insights': typeof RcaInsightsRoute
   '/rca/upload': typeof RcaUploadRoute
   '/rca': typeof RcaIndexRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/environments': typeof EnvironmentsRoute
   '/tools': typeof ToolsRoute
+  '/api/agent': typeof ApiAgentRoute
   '/rca/insights': typeof RcaInsightsRoute
   '/rca/upload': typeof RcaUploadRoute
   '/rca/': typeof RcaIndexRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/environments'
     | '/tools'
+    | '/api/agent'
     | '/rca/insights'
     | '/rca/upload'
     | '/rca/'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/environments'
     | '/tools'
+    | '/api/agent'
     | '/rca/insights'
     | '/rca/upload'
     | '/rca'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/environments'
     | '/tools'
+    | '/api/agent'
     | '/rca/insights'
     | '/rca/upload'
     | '/rca/'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   EnvironmentsRoute: typeof EnvironmentsRoute
   ToolsRoute: typeof ToolsRoute
+  ApiAgentRoute: typeof ApiAgentRoute
   RcaInsightsRoute: typeof RcaInsightsRoute
   RcaUploadRoute: typeof RcaUploadRoute
   RcaIndexRoute: typeof RcaIndexRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/agent': {
+      id: '/api/agent'
+      path: '/api/agent'
+      fullPath: '/api/agent'
+      preLoaderRoute: typeof ApiAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rca/': {
       id: '/rca/'
       path: '/rca'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   EnvironmentsRoute: EnvironmentsRoute,
   ToolsRoute: ToolsRoute,
+  ApiAgentRoute: ApiAgentRoute,
   RcaInsightsRoute: RcaInsightsRoute,
   RcaUploadRoute: RcaUploadRoute,
   RcaIndexRoute: RcaIndexRoute,

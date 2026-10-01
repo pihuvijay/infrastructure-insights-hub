@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { AgentPanel } from "@/components/AgentPanel";
 
 function NotFoundComponent() {
   return (
@@ -79,10 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "InfraCore — Operations hub" },
-      { name: "description", content: "One hub for tools, environment snapshots and AI-powered root cause analysis." },
-      { property: "og:title", content: "InfraCore — Operations hub" },
-      { property: "og:description", content: "One hub for tools, environment snapshots and AI-powered root cause analysis." },
+      { title: "GEV System Delivery" },
+      { name: "description", content: "Tools, environment snapshots and multi-agent root cause analysis for GEV System Delivery." },
+      { property: "og:title", content: "GEV System Delivery" },
+      { property: "og:description", content: "Tools, environment snapshots and multi-agent root cause analysis for GEV System Delivery." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -126,6 +127,7 @@ function RootComponent() {
             <Outlet />
           </div>
         </main>
+        <AgentPanel />
       </div>
       <Toaster theme="dark" position="bottom-right" />
     </QueryClientProvider>

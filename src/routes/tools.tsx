@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/tools")({
   head: () => ({
     meta: [
-      { title: "Tools & Onboarding — InfraCore" },
+      { title: "Tools & Onboarding — GEV System Delivery" },
       { name: "description", content: "Every team tool grouped into folders, plus a one-click onboarding export." },
-      { property: "og:title", content: "Tools & Onboarding — InfraCore" },
+      { property: "og:title", content: "Tools & Onboarding — GEV System Delivery" },
       { property: "og:description", content: "One launcher instead of 30 bookmarks." },
     ],
   }),
@@ -19,10 +19,10 @@ export const Route = createFileRoute("/tools")({
 
 function exportBookmarks() {
   const body = FOLDERS.map((f) => `<DT><H3>${f.name}</H3>\n<DL><p>\n${f.tools.map((t) => `<DT><A HREF="${t.url}">${t.name}</A>`).join("\n")}\n</DL><p>`).join("\n");
-  const html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<TITLE>InfraCore</TITLE><H1>InfraCore</H1>\n<DL><p>\n${body}\n</DL><p>`;
+  const html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<TITLE>GEV System Delivery</TITLE><H1>GEV System Delivery</H1>\n<DL><p>\n${body}\n</DL><p>`;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([html], { type: "text/html" }));
-  a.download = "infracore-bookmarks.html";
+  a.download = "gev-bookmarks.html";
   a.click();
 }
 

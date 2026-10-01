@@ -74,3 +74,45 @@ export const timeAgo = (iso: string) => {
 };
 export const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+
+export const MONTHLY = [
+  { month: "Apr", incidents: 14, avgHours: 6.8 },
+  { month: "May", incidents: 18, avgHours: 7.4 },
+  { month: "Jun", incidents: 12, avgHours: 5.9 },
+  { month: "Jul", incidents: 21, avgHours: 8.1 },
+  { month: "Aug", incidents: 17, avgHours: 6.2 },
+  { month: "Sep", incidents: 23, avgHours: 7.9 },
+];
+
+export const ROOT_CAUSES = [
+  { name: "Connection leaks", value: 31 },
+  { name: "Cert expiry", value: 19 },
+  { name: "Config drift", value: 22 },
+  { name: "Capacity", value: 16 },
+  { name: "Other", value: 12 },
+];
+
+export const SUBSYSTEMS = [
+  { name: "Database", critical: 6, high: 5, medium: 3 },
+  { name: "Network", critical: 2, high: 6, medium: 4 },
+  { name: "Storage", critical: 1, high: 3, medium: 7 },
+  { name: "Auth / PKI", critical: 3, high: 4, medium: 2 },
+  { name: "Monitoring", critical: 0, high: 2, medium: 5 },
+];
+
+// hours to resolve: rows = subsystem, cols = month (Apr–Sep)
+export const HEATMAP = [
+  { name: "Database", hours: [9, 12, 6, 14, 8, 15] },
+  { name: "Network", hours: [4, 6, 5, 7, 3, 6] },
+  { name: "Storage", hours: [3, 5, 2, 6, 7, 5] },
+  { name: "Auth / PKI", hours: [6, 2, 8, 3, 9, 7] },
+  { name: "Monitoring", hours: [2, 3, 1, 4, 2, 3] },
+];
+
+export const AGENTS = [
+  { id: "ingest", name: "Ingest", desc: "Pulls ServiceNow & Box" },
+  { id: "embed", name: "Embed", desc: "Chunks & vectorises" },
+  { id: "cluster", name: "Cluster", desc: "Groups by root cause" },
+  { id: "impact", name: "Impact", desc: "Estimates hours" },
+  { id: "advisor", name: "Advisor", desc: "Chats with you" },
+];

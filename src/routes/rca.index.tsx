@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/rca/")({
   head: () => ({
     meta: [
-      { title: "RCA Search — InfraCore" },
+      { title: "RCA Search — GEV System Delivery" },
       { name: "description", content: "Describe a symptom and find similar past incidents across ServiceNow and Box." },
-      { property: "og:title", content: "RCA Search — InfraCore" },
+      { property: "og:title", content: "RCA Search — GEV System Delivery" },
       { property: "og:description", content: "Find similar incidents and their root causes." },
     ],
   }),
