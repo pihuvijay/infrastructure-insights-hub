@@ -23,7 +23,7 @@ function score(q: string, text: string) {
   const words = q.toLowerCase().split(/\W+/).filter((w) => w.length > 2);
   if (!words.length) return 0;
   const t = text.toLowerCase();
-  return words.filter((w) => t.includes(w.slice(0, 5))).length / words.length;
+  return words.filter((w) => t.includes((w ?? "").slice(0, 5))).length / words.length;
 }
 
 function RcaSearch() {
