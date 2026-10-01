@@ -7,6 +7,7 @@ import {
   MOCK_NOW,
   PEOPLE,
   PROJECTS,
+  RELEASE_ENVS,
   ROOT_CAUSE_CODES,
   SNOW_INCIDENTS,
 } from "./mock-data";
@@ -22,6 +23,7 @@ import type {
   Insights,
   PublishResult,
   RcaReport,
+  ReleaseEnv,
   ScoredIncident,
   SearchRequest,
   SearchResponse,
@@ -381,3 +383,5 @@ export async function mockPublishReport(report: RcaReport, blob: Blob): Promise<
 export async function mockWordUrl(): Promise<string> {
   throw new Error("Word Online needs the live Box connection. It is unavailable in mock mode.");
 }
+
+export const mockReleaseEnvs = async (): Promise<ReleaseEnv[]> => RELEASE_ENVS;

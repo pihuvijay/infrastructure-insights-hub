@@ -9,6 +9,7 @@ import type {
   Insights,
   PublishResult,
   RcaReport,
+  ReleaseEnv,
   SnowIncident,
   SnowIncidentDetail,
   SearchRequest,
@@ -36,6 +37,9 @@ export const api = {
   insights: (): Promise<Insights> => (LIVE ? http("/rca/insights") : mock.mockInsights()),
   filterOptions: (): Promise<FilterOptions> =>
     LIVE ? http("/rca/filters") : mock.mockFilterOptions(),
+
+  releaseEnvs: (): Promise<ReleaseEnv[]> =>
+    LIVE ? http("/release/environments") : mock.mockReleaseEnvs(),
 
   environments: (): Promise<Env[]> => (LIVE ? http("/environments") : mock.mockEnvironments()),
   notifyManager: (id: string): Promise<Env[]> =>

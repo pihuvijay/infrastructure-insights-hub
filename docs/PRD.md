@@ -74,6 +74,10 @@ Every chart is interactive: hover shows the value, clicking a bar, slice, trend 
 
 Two tabs: **Upload** (drop zone, per-file status) and **Connect** (ServiceNow, Box: one-click connect, discovered scope, sync now, disconnect). No inputs to fill.
 
+### 5.10 Build Release Progress `/build-release`
+
+Three clickable progress trackers (PD1, PD2, MPR1): tickets done / total. Each opens `/build-release/[env]`, a page of that environment's tickets (id, title, assignee, priority, state). Mock data until the backend exists.
+
 ### 5.9 Admin `/admin`
 
 Line manager (pick from list), notification toggles.
@@ -101,6 +105,7 @@ Exported as `.docx` with these headings in this order. Do not rename or reorder 
 | --------------- | ----------------------------------------- | -------------------------------------------------------------------------------- |
 | GET             | /tools/folders                            | tool folders                                                                     |
 | GET             | /environments                             | environments                                                                     |
+| GET             | /release/environments                     | release environments with tickets (Build Release Progress)                       |
 | POST            | /environments/{id}/notify                 | notify manager                                                                   |
 | POST            | /environments/{id}/snapshots/apply-latest | log latest detected snapshot                                                     |
 | GET             | /rca/filters                              | `{projects, people}`                                                             |

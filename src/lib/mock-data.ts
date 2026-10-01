@@ -5,6 +5,8 @@ import type {
   Incident,
   Insights,
   Priority,
+  ReleaseEnv,
+  ReleaseTicket,
   RcaStatus,
   SnowIncidentDetail,
 } from "./types";
@@ -555,3 +557,44 @@ export const SNOW_INCIDENTS: SnowIncidentDetail[] = [
   ...INCIDENTS.map(fromIncident),
   ...OLDER,
 ].sort((a, b) => b.opened.localeCompare(a.opened));
+
+const T = (
+  id: string,
+  title: string,
+  assignee: string,
+  priority: Priority,
+  state: ReleaseTicket["state"],
+): ReleaseTicket => ({ id, title, assignee, priority, state });
+
+export const RELEASE_ENVS: ReleaseEnv[] = [
+  {
+    id: "PD1",
+    tickets: [
+      T("REL-101", "Apply database patch bundle", "A. Patel", "P2", "done"),
+      T("REL-102", "Rotate service certificates", "J. Moreno", "P3", "done"),
+      T("REL-103", "Deploy ingest service v2.4", "A. Patel", "P2", "done"),
+      T("REL-104", "Smoke test historian feeds", "S. Okafor", "P3", "in_progress"),
+      T("REL-105", "Update monitoring dashboards", "J. Moreno", "P4", "todo"),
+    ],
+  },
+  {
+    id: "PD2",
+    tickets: [
+      T("REL-201", "Apply database patch bundle", "S. Okafor", "P2", "done"),
+      T("REL-202", "Rotate service certificates", "L. Chen", "P3", "in_progress"),
+      T("REL-203", "Deploy ingest service v2.4", "L. Chen", "P2", "todo"),
+      T("REL-204", "Smoke test historian feeds", "S. Okafor", "P3", "todo"),
+      T("REL-205", "Update monitoring dashboards", "J. Moreno", "P4", "todo"),
+      T("REL-206", "Verify failover runbook", "A. Patel", "P1", "todo"),
+    ],
+  },
+  {
+    id: "MPR1",
+    tickets: [
+      T("REL-301", "Apply database patch bundle", "L. Chen", "P2", "todo"),
+      T("REL-302", "Rotate service certificates", "J. Moreno", "P3", "todo"),
+      T("REL-303", "Deploy ingest service v2.4", "A. Patel", "P2", "todo"),
+      T("REL-304", "Smoke test historian feeds", "S. Okafor", "P3", "todo"),
+    ],
+  },
+];

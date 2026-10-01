@@ -196,3 +196,16 @@ export interface PublishResult {
   fileName: string;
   boxUrl: string;
 }
+
+export type TicketState = "todo" | "in_progress" | "done";
+export interface ReleaseTicket {
+  id: string;
+  title: string;
+  assignee: string;
+  priority: Priority;
+  state: TicketState;
+}
+export interface ReleaseEnv {
+  id: string;
+  tickets: ReleaseTicket[];
+}

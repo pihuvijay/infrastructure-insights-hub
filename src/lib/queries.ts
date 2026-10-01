@@ -69,3 +69,4 @@ export function useUploadFiles() {
 }
 
 export const useSnowIncidents = () => useQuery({ queryKey: ["snow"], queryFn: api.snowIncidents });
+export const useReleaseEnvs = () => useQuery({ queryKey: ["release"], queryFn: api.releaseEnvs });

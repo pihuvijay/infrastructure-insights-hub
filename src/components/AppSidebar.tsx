@@ -3,8 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/components/images/gev-mark.png";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
+  Plus,
+  Rocket,
   LayoutGrid,
   FilePlus2,
   Search,
@@ -16,7 +18,7 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const item =
@@ -27,6 +29,13 @@ const active =
 export function AppSidebar() {
   const path = usePathname();
   const [rcaOpen, setRcaOpen] = useState(path.startsWith("/rca"));
+  const router = useRouter();
+  const [release, setReleaseState] = useState(false);
+  useEffect(() => setReleaseState(localStorage.getItem("sidebar:build-release") === "1"), []);
+  const setRelease = (v: boolean) => {
+    localStorage.setItem("sidebar:build-release", v ? "1" : "0");
+    setReleaseState(v);
+  };
   const is = (p: string) => path === p;
 
   return (
@@ -79,6 +88,25 @@ export function AppSidebar() {
             <FolderTree className="size-4" />
             Tools
           </Link>
+          {release ? (
+            <Link href="/build-release" className={cn(item, is("/build-release") && active)}>
+              <Rocket className="size-4" />
+              Build Release Progress
+            </Link>
+          ) : (
+            <button
+              onClick={() => {
+                setRelease(true);
+                router.push("/build-release");
+              }}
+              aria-label="Add Build Release Progress"
+              className={cn(item, "w-full opacity-50 hover:opacity-100")}
+            >
+              <Rocket className="size-4" />
+              Build Release Progress
+              <Plus className="ml-auto size-3" />
+            </button>
+          )}
         </div>
         <div className="space-y-0.5">
           <Link href="/rca/upload" className={cn(item, is("/rca/upload") && active)}>
