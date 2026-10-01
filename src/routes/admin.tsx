@@ -9,7 +9,7 @@ export const Route = createFileRoute("/admin")({
       { title: "Admin Settings — GEV System Delivery" },
       { name: "description", content: "Manage notifications, line manager and data sources." },
       { property: "og:title", content: "Admin Settings — GEV System Delivery" },
-      { property: "og:description", content: "InfraCore preferences." },
+      { property: "og:description", content: "GEV System Delivery preferences." },
     ],
   }),
   component: Admin,
