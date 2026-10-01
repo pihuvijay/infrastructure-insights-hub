@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-surface: var(--surface);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-brand: var(--brand);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-line: var(--paper-line);
+  --color-paper-hover: var(--paper-hover);
+}
+
+:root {
+  --radius: 0.75rem;
+  --brand: #005f61;
+  --background: oklch(0.1 0 0);
+  --foreground: oklch(0.97 0 0);
+  --sidebar: oklch(0.075 0 0);
+  --card: oklch(0.135 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --surface: oklch(0.175 0 0);
+  --popover: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.72 0.1 190);
+  --primary-foreground: oklch(0.12 0.02 190);
+  --primary-soft: oklch(0.72 0.1 190 / 14%);
+  --secondary: oklch(0.2 0 0);
+  --secondary-foreground: oklch(0.92 0 0);
+  --muted: oklch(0.2 0 0);
+  --muted-foreground: oklch(0.67 0 0);
+  --accent: oklch(0.22 0 0);
+  --accent-foreground: oklch(0.97 0 0);
+  --warning: oklch(0.8 0.15 75);
+  --warning-soft: oklch(0.8 0.15 75 / 12%);
+  --destructive: oklch(0.68 0.19 22);
+  --destructive-soft: oklch(0.68 0.19 22 / 12%);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 11%);
+  --ring: oklch(0.72 0.1 190 / 55%);
+  --paper: oklch(0.99 0 0);
+  --paper-foreground: oklch(0.22 0.01 250);
+  --paper-muted: oklch(0.52 0.015 250);
+  --paper-line: oklch(0.88 0.005 250);
+  --paper-hover: oklch(0.96 0.005 250);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: var(--primary-soft);
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border bg-card;
+  }
+  .eyebrow {
+    @apply font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground;
+  }
+  .btn-primary {
+    @apply inline-flex h-9 items-center gap-2 rounded-lg bg-brand px-3.5 text-sm font-medium text-white transition hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+  .btn-ghost {
+    @apply inline-flex h-8 items-center gap-1.5 rounded-lg border bg-surface px-3 text-[13px] font-medium text-secondary-foreground transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+  .btn-done {
+    @apply inline-flex h-8 items-center gap-1.5 rounded-lg border border-primary/30 bg-primary-soft px-3 text-[13px] font-medium text-primary;
+  }
+  .input {
+    @apply h-10 w-full rounded-lg border bg-card px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
+  }
+  .textarea {
+    @apply field-sizing-content min-h-9 w-full resize-none rounded-lg border bg-card px-3 py-2 text-[13px] leading-relaxed placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
+  }
+  .paper-field {
+    @apply field-sizing-content block min-h-8 w-full resize-none rounded-sm bg-transparent px-1.5 py-1 text-[14px] leading-relaxed text-paper-foreground placeholder:text-paper-muted hover:bg-paper-hover focus:bg-paper-hover focus:outline-none focus:ring-1 focus:ring-primary;
+  }
+  .icon-tile {
+    @apply grid size-9 place-items-center rounded-lg bg-primary-soft text-primary;
+  }
+}
+
+:root {
+  --chart-1: oklch(0.72 0.1 190);
+  --chart-2: oklch(0.86 0.05 190);
+  --chart-3: oklch(0.8 0.15 75);
+  --chart-4: oklch(0.68 0.19 22);
+  --chart-5: oklch(0.62 0 0);
+  --chart-grid: oklch(1 0 0 / 6%);
+}
+@theme inline {
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+.doc-editor {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--paper-foreground);
+}
+.doc-editor h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+}
+.doc-editor h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 1.75rem 0 0.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--paper-line);
+}
+.doc-editor p {
+  margin: 0.25rem 0;
+}
+.doc-editor ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+.doc-editor ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+.doc-editor table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  table-layout: fixed;
+}
+.doc-editor th,
+.doc-editor td {
+  border: 1px solid var(--paper-line);
+  padding: 4px 8px;
+  vertical-align: top;
+  position: relative;
+}
+.doc-editor th {
+  background: var(--paper-hover);
+  text-align: left;
+  font-weight: 600;
+}
+.doc-editor .selectedCell {
+  background: var(--primary-soft);
+}
+.doc-editor .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--primary);
+}
+
+.recharts-bar-rectangle path,
+.recharts-pie-sector path,
+.recharts-line-curve {
+  cursor: pointer;
+}
