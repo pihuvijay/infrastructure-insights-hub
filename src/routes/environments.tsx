@@ -20,7 +20,7 @@ export const Route = createFileRoute("/environments")({
 function Environments() {
   const envs = useEnvs();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ id: envs[0].id, snapshot: "", by: "pihuvijay" });
+  const [form, setForm] = useState({ id: envs[0]?.id ?? "", snapshot: "", by: "pihuvijay" });
 
   return (
     <>
