@@ -8,9 +8,9 @@ import { fmtDate, timeAgo } from "@/lib/data";
 export const Route = createFileRoute("/environments")({
   head: () => ({
     meta: [
-      { title: "Environment Tracker — InfraCore" },
+      { title: "Environment Tracker — GEV System Delivery" },
       { name: "description", content: "See which snapshot was last applied to each environment and notify your line manager." },
-      { property: "og:title", content: "Environment Tracker — InfraCore" },
+      { property: "og:title", content: "Environment Tracker — GEV System Delivery" },
       { property: "og:description", content: "Track snapshots per environment." },
     ],
   }),

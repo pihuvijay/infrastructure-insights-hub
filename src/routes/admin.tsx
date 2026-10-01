@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Settings — InfraCore" },
+      { title: "Admin Settings — GEV System Delivery" },
       { name: "description", content: "Manage notifications, line manager and data sources." },
-      { property: "og:title", content: "Admin Settings — InfraCore" },
+      { property: "og:title", content: "Admin Settings — GEV System Delivery" },
       { property: "og:description", content: "InfraCore preferences." },
     ],
   }),

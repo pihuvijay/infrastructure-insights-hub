@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/rca/insights")({
   head: () => ({
     meta: [
-      { title: "Incident Insights — InfraCore" },
+      { title: "Incident Insights — GEV System Delivery" },
       { name: "description", content: "Clustered recurring incidents with hours spent and estimated time savings." },
-      { property: "og:title", content: "Incident Insights — InfraCore" },
+      { property: "og:title", content: "Incident Insights — GEV System Delivery" },
       { property: "og:description", content: "See recurring root causes and the hours they cost." },
     ],
   }),

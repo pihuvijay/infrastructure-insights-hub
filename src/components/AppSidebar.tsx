@@ -16,8 +16,8 @@ export function AppSidebar() {
       <div className="flex items-center gap-3 px-5 py-5">
         <div className="icon-tile"><ShieldCheck className="size-4.5" /></div>
         <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-tight">InfraCore</div>
-          <div className="text-xs text-muted-foreground">Operations hub</div>
+          <div className="text-sm font-semibold tracking-tight">GEV</div>
+          <div className="text-xs text-muted-foreground">System Delivery</div>
         </div>
       </div>
 

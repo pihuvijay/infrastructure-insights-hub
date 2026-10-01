@@ -7,9 +7,9 @@ import { CLUSTERS, FOLDERS, timeAgo } from "@/lib/data";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Homepage — InfraCore" },
+      { title: "Homepage — GEV System Delivery" },
       { name: "description", content: "Your personalised operations dashboard: environments, shortcuts and incident insights." },
-      { property: "og:title", content: "Homepage — InfraCore" },
+      { property: "og:title", content: "Homepage — GEV System Delivery" },
       { property: "og:description", content: "Your personalised operations dashboard." },
     ],
   }),
