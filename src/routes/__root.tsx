@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { AgentPanel } from "@/components/AgentPanel";
 
 function NotFoundComponent() {
   return (
@@ -126,6 +127,7 @@ function RootComponent() {
             <Outlet />
           </div>
         </main>
+        <AgentPanel />
       </div>
       <Toaster theme="dark" position="bottom-right" />
     </QueryClientProvider>
