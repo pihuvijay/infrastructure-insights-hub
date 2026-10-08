@@ -18,8 +18,8 @@ Note: `docs/build-plan.md`, `docs/commands.md` and the foundation prompt are unt
 
 ## Phases
 - [x] Phase 0: context pack (`repo-inventory.md`, `project-context.md`, `corrections.md`, `open-questions.md`, this file)
-- [ ] Phase 1: folder skeleton
-- [ ] Phase 2: architecture and supporting docs
+- [x] Phase 1: folder skeleton (READMEs in backend/*, infra/*, docs/adr, docs/architecture/agents)
+- [x] Phase 2: architecture and supporting docs (requirements, engineering-practices, testing, security, runbook, glossary, 17 architecture docs, 5 agent docs; `docs/build-plan.md` appended with a Notes section, 838 to 860 lines)
 - [ ] Phase 3: ADRs
 - [ ] Phase 4: skills
 - [ ] Phase 5: review agents
