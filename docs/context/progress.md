@@ -21,8 +21,8 @@ Note: `docs/build-plan.md`, `docs/commands.md` and the foundation prompt are unt
 - [x] Phase 1: folder skeleton (READMEs in backend/*, infra/*, docs/adr, docs/architecture/agents)
 - [x] Phase 2: architecture and supporting docs (requirements, engineering-practices, testing, security, runbook, glossary, 17 architecture docs, 5 agent docs; `docs/build-plan.md` appended with a Notes section, 838 to 860 lines)
 - [x] Phase 3: ADRs 0001-0026 plus `docs/adr/README.md` index (ADR 0013 is Proposed)
-- [ ] Phase 4: skills
-- [ ] Phase 5: review agents
+- [x] Phase 4: 21 skills in `.claude/skills/`
+- [x] Phase 5: `.claude/agents/code-reviewer.md`, `security-reviewer.md`
 - [ ] Phase 6: CLAUDE.md and AGENTS.md additions
 - [ ] Phase 7: self-check and final report
 
@@ -33,4 +33,7 @@ Phase 0: all five files in `docs/context/` created.
 See `docs/context/corrections.md` items 22-28.
 
 ## Skill and agent overlaps with `.devin/`
-(filled in Phases 4-5)
+- `.devin/agents/reviewer` (spec completeness, design, RLS) overlaps in purpose with the new `code-reviewer`. Kept both. `code-reviewer` references the `.devin` reviewer as complementary. The `.devin` reviewer mentions RLS (Supabase), which does not apply to this stack; suggestion only, see `corrections.md`.
+- `.devin/agents/tester` has no new equivalent; kept as is.
+- `.devin/skills/build-feature` and `test-before-pr` have no overlap with the 21 new skills. `connect-frontend-endpoint` and `docs/testing.md` reference them instead of repeating them.
+- `.devin/agents/reviewer` has no `security-reviewer` counterpart; the new one is additive.
