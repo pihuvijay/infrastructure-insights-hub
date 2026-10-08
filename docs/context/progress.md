@@ -23,14 +23,14 @@ Note: `docs/build-plan.md`, `docs/commands.md` and the foundation prompt are unt
 - [x] Phase 3: ADRs 0001-0026 plus `docs/adr/README.md` index (ADR 0013 is Proposed)
 - [x] Phase 4: 21 skills in `.claude/skills/`
 - [x] Phase 5: `.claude/agents/code-reviewer.md`, `security-reviewer.md`
-- [ ] Phase 6: CLAUDE.md and AGENTS.md additions
-- [ ] Phase 7: self-check and final report
+- [x] Phase 6: CLAUDE.md (34 to 68 lines) and AGENTS.md (9 to 43 lines) appended; `git diff --numstat` shows 0 deletions for both
+- [x] Phase 7: self-check. Links all resolve; 26 ADRs with all five sections (0013 is short because it is Proposed with TODO alternatives); 21 skills with all required sections; PRD.md, README.md, package.json, .env.example, src/, .devin/, docs/checklists/ show no diff vs main. Final line counts: PRD 129, CLAUDE 68, AGENTS 43, README 153, .env.example 4, package.json 91, commands.md 146, build-plan.md 860 (all equal or higher).
 
 ## Files created or appended
 Phase 0: all five files in `docs/context/` created.
 
 ## Open conflicts
-See `docs/context/corrections.md` items 22-28.
+See `docs/context/corrections.md` items 22-29. No conflicts were found inside CLAUDE.md or AGENTS.md.
 
 ## Skill and agent overlaps with `.devin/`
 - `.devin/agents/reviewer` (spec completeness, design, RLS) overlaps in purpose with the new `code-reviewer`. Kept both. `code-reviewer` references the `.devin` reviewer as complementary. The `.devin` reviewer mentions RLS (Supabase), which does not apply to this stack; suggestion only, see `corrections.md`.
