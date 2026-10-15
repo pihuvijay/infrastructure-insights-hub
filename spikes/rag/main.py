@@ -12,7 +12,6 @@ def get_store(rebuild: bool) -> VectorStore:
         chunks = to_chunks(INCIDENTS)
         print(f"embedding {len(chunks)} chunks from {len(INCIDENTS)} incidents...")
         store = VectorStore.build(chunks)
-        store.save()
     return store
 
 
