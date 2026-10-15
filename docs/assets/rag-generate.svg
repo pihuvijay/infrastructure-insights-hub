@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.t{fill:#e5e5e5;font-size:13px;text-anchor:middle}.s{fill:#8a8a8a;font-size:10.5px;text-anchor:middle}.h{fill:#2dd4bf;font-size:12px}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 14s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35}7%{opacity:1}14%{opacity:.35}}
+.c{fill:#005f61;stroke:#2dd4bf;stroke-width:1}
+.tk{fill:#2dd4bf;font-size:12px;opacity:0;animation:k 14s linear infinite}@keyframes k{0%,60%{opacity:0}64%,100%{opacity:1}}
+</style>
+<rect width="1000" height="400" fill="#000" rx="14"/>
+<text x="500" y="26" class="t" style="font-size:18px">After retrieval: prompt, LLM, answer</text>
+<rect x="20" y="50" width="190" height="130" rx="10" class="b a"/><text x="115" y="72" class="t">Retrieved chunks</text>
+<rect x="35" y="84" width="160" height="22" rx="4" class="c"/><text x="115" y="99" class="s" style="fill:#e5e5e5">INC001 cert expired after patch</text>
+<rect x="35" y="112" width="160" height="22" rx="4" class="c"/><text x="115" y="127" class="s" style="fill:#e5e5e5">INC014 SSO outage, cert</text>
+<rect x="35" y="140" width="160" height="22" rx="4" class="c"/><text x="115" y="155" class="s" style="fill:#e5e5e5">INC022 login failed, renewed cert</text>
+<rect x="20" y="210" width="190" height="64" rx="10" class="b a" style="animation-delay:1.5s"/><text x="115" y="234" class="t">Question + context</text><text x="115" y="252" class="s">tagged cluster, stored hours</text>
+<rect x="20" y="296" width="190" height="52" rx="10" class="b a" style="animation-delay:3s"/><text x="115" y="318" class="t">Instructions</text><text x="115" y="336" class="s">answer only from context, cite</text>
+<path class="l" d="M210 115H260M210 242H260M210 322H260"/>
+<rect x="260" y="50" width="200" height="298" rx="10" class="b a" style="animation-delay:4.5s"/><text x="360" y="74" class="t">Assemble prompt</text><text x="360" y="92" class="s">plain code, no LLM</text>
+<text x="275" y="124" class="s" style="text-anchor:start;fill:#2dd4bf">SYSTEM</text><text x="275" y="140" class="s" style="text-anchor:start">Answer only from the</text><text x="275" y="154" class="s" style="text-anchor:start">incidents below. Cite them.</text>
+<text x="275" y="182" class="s" style="text-anchor:start;fill:#2dd4bf">CONTEXT</text><text x="275" y="198" class="s" style="text-anchor:start">[INC001] cert expired...</text><text x="275" y="212" class="s" style="text-anchor:start">[INC014] SSO outage...</text><text x="275" y="226" class="s" style="text-anchor:start">[INC022] renewed cert...</text>
+<text x="275" y="254" class="s" style="text-anchor:start;fill:#2dd4bf">TAGGED</text><text x="275" y="270" class="s" style="text-anchor:start">cluster, hours from Impact</text>
+<text x="275" y="298" class="s" style="text-anchor:start;fill:#2dd4bf">QUESTION</text><text x="275" y="314" class="s" style="text-anchor:start">Why does login fail after patching?</text>
+<rect x="510" y="110" width="170" height="130" rx="10" class="b a" style="animation-delay:7s"/><text x="595" y="138" class="t">LLM</text><text x="595" y="158" class="s">Llama 3.1 + LoRA</text><text x="595" y="174" class="s">on vLLM, GPU server</text>
+<text x="595" y="198" class="s">summarises</text><text x="595" y="212" class="s">spots the pattern</text><text x="595" y="226" class="s">cites sources</text>
+<path class="l" d="M460 175H510"/><path class="l" d="M680 175H730"/>
+<rect x="730" y="50" width="250" height="298" rx="10" class="b a" style="animation-delay:9s"/><text x="855" y="74" class="t">Answer, streamed over SSE</text>
+<text x="745" y="112" class="tk" style="animation-delay:0s">This looks like the recurring</text>
+<text x="745" y="130" class="tk">expired-certificate issue.</text>
+<text x="745" y="158" class="tk">Seen in INC001, INC014, INC022.</text>
+<text x="745" y="186" class="tk">Fixed by renewing the cert</text>
+<text x="745" y="204" class="tk">before the patch window.</text>
+<rect x="745" y="232" width="220" height="24" rx="6" class="c"/><text x="855" y="249" class="s" style="fill:#e5e5e5">Related incidents + match scores</text>
+<rect x="745" y="264" width="220" height="24" rx="6" class="b"/><text x="855" y="281" class="s">Follow-up chat</text>
+<rect x="745" y="296" width="220" height="40" rx="6" class="b" style="stroke:#f59e0b"/><text x="855" y="313" class="s" style="fill:#f59e0b">RCA draft: engineer edits, approves</text><text x="855" y="328" class="s" style="fill:#f59e0b">then Box</text>
+<text x="500" y="378" class="s">The LLM only sees the retrieved chunks. Wrong chunks in, wrong answer out. Hours come from the Impact job, never from the LLM.</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="14s" repeatCount="indefinite" path="M115 115 L260 115 L360 175 L595 175 L855 175"/></circle>
+</svg>
