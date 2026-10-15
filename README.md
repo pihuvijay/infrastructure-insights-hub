@@ -757,3 +757,67 @@ Tests never call a real LLM except the evals. The staging image that passes is t
 ## Docs
 
 `docs/PRD.md` (spec) · `docs/architecture/` (how) · `docs/adr/` (why) · `docs/commands.md` · `docs/runbook.md` · `docs/security.md` · `docs/testing.md` · [previous README](docs/README-original.md)
+
+## Requirements request: software, VMs, hardware and tools (added 2026-10-15)
+
+Request list for IT, the manager and security. Sources are in the last column. Sizes marked "proposed" are starting estimates, not decisions: no document sets them, so IT must confirm. Everything runs on the company network ([ADR 0002](docs/adr/0002-on-premises-vms.md)).
+
+### Virtual machines and hardware
+
+| # | Item | What it is | Why we need it | Proposed size | Source |
+|---|---|---|---|---|---|
+| 1 | VM 1: Application server | Runs Nginx, the Next.js frontend, the FastAPI backend and the background worker as Docker containers | Serves the web app and runs the API and the four background jobs | 4 vCPU, 16 GB RAM, 100 GB disk (proposed) | ADR 0002, deployment.md |
+| 2 | VM 2: Database server | PostgreSQL 16 with the pgvector extension | Stores all durable data and the search vectors; ticket data must not leave the network | 4 vCPU, 16 GB RAM, 200 GB disk, with backups (proposed) | ADR 0002, ADR 0005 |
+| 3 | VM 3: Redis server | Redis 7 | Job queue, cache and agent state | 2 vCPU, 8 GB RAM, 20 GB disk (proposed) | ADR 0002, ADR 0006 |
+| 4 | VM 4: AI model server (GPU) | A GPU machine running vLLM for the private LLM, and probably the embedding model | Private AI drafting, search and chat without sending data outside | GPU with 24 GB or more memory (for example NVIDIA L4 24 GB or A100 40/80 GB); an 8B model needs about 16 GB at full precision or 5-6 GB 4-bit, plus room for the KV cache | llm-serving.md |
+| 5 | Staging environment | A second set of the above, or a smaller test VM | Test changes and run the AI evals before production | Smaller than production (proposed) | deployment.md, ADR 0016, ADR 0023 |
+| 6 | Production environment | The four VMs above | Real use by 200-1,000 internal users | See rows 1-4 | requirements.md |
+| 7 | Backup storage | Storage and a schedule for Postgres backups | Supabase backups were automatic; on-prem we must arrange them. Owner is TODO | Size depends on database growth | ADR 0002 |
+| 8 | File storage for uploads | Storage that is not the app VM's disk | The backend must stay stateless | TODO | scaling.md |
+
+### Network and access
+
+| Item | What it is | Why we need it | Source |
+|---|---|---|---|
+| Static internal IPs or DNS names | Fixed addresses for all VMs | Services find each other reliably | ADR 0002 |
+| Firewall rules | App VM to the database, Redis, GPU server, ServiceNow and Box | The app cannot work without these connections | deployment.md |
+| HTTPS certificate | A certificate for the app's internal name | Nginx terminates HTTPS | ADR 0011 |
+| ServiceNow API access | Credentials, scope and rate limits from the ServiceNow admins | Read incident data | open-questions.md |
+| Box API access | Credentials and rate limits from the Box admins | Upload approved RCAs; Box is the system of record | ADR 0015 |
+| Sign-in method | Probably Microsoft Entra ID (SSO) and an app registration | Per-user access; still proposed | ADR 0013 |
+| Hugging Face access, or a way to transfer files | The GPU server must download model weights, or we copy them in | Get the LLM and embedding model | llm-serving.md |
+| Secrets storage | A place for production secrets | Credentials stay out of Git and the browser | open-questions.md |
+| Notification channel | Email, Teams or in-app (undecided) | Tell the line manager when a snapshot is applied | open-questions.md |
+
+### Software and services
+
+| Item | What it is | Why we need it | Source |
+|---|---|---|---|
+| Docker and Docker Compose | Container packaging | The same image runs on a laptop, staging and production | ADR 0016 |
+| Container registry | GitHub Container Registry or an internal one | Store the images CI builds; production promotes the staging image | ci-cd.md, ADR 0024 |
+| GitHub and GitHub Actions | Code hosting and CI | Lint, tests and builds on every pull request | ADR 0024 |
+| Self-hosted runner, or IT's deploy tool | A CI runner inside the network | CI cannot reach internal VMs otherwise | ADR 0024 |
+| Nginx | Web server and reverse proxy | HTTPS, routing, ingress rate limiting, SSE settings | ADR 0011 |
+| Node.js and the Next.js app | Frontend runtime | Serves the UI | CLAUDE.md |
+| Python and FastAPI, SQLAlchemy, Alembic | Backend and database migrations | API, logic, schema changes | ADR 0003, AGENTS.md |
+| PostgreSQL 16 with pgvector | Database and vector search | Durable data and RAG search | ADR 0005 |
+| Redis 7 | Queue, cache, agent state | Background jobs and agents | ADR 0006 |
+| LangGraph | Agent framework | The agent steps with limits and timeouts | ADR 0007 |
+| vLLM | Model server on the GPU | Handles many requests at once | ADR 0008 |
+| Ollama | Local model server | Laptop development only | ADR 0023 |
+| LLM and embedding models | Open models served by us; choice is TODO after evals | The AI itself | models.md |
+| Observability stack | JSON logs, OpenTelemetry, and self-hosted tracing (Langfuse candidate) | See errors, latency and agent steps without data leaving the network | observability.md, ADR 0025 |
+| Alerting tool | Alert channel is TODO | An error alert must fire before launch | observability.md |
+
+### AI development tools
+
+| Item | What it is | Why we need it | Notes |
+|---|---|---|---|
+| Devin Enterprise | The Devin coding agent (CLI and desktop app) with enterprise terms | Builds and reviews the code in this repo, using `AGENTS.md` and `.devin/` | Enterprise is the tier with admin and data controls; confirm the exact plan with the vendor |
+| Claude Pro | A Claude subscription for Claude Code | Alternative coding agent, using `CLAUDE.md` and `.claude/` | Pro is an individual plan; confirm it is allowed for company code |
+
+Both tools send code to an outside AI service. Security must approve this before they touch the repo. Real ServiceNow or Box data must never go into them, only mock data. This matches the open question "Is any external AI API allowed during development?" in `docs/context/open-questions.md`.
+
+### Still unconfirmed
+
+Number of VMs ("sparse server" is undefined), exact sizes, GPU model, backup owner, auth method, CI platform. All are tracked in `docs/context/open-questions.md`.
