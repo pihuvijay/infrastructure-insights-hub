@@ -4,7 +4,7 @@ from typing import TypedDict
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 
-from config import CHAT_MODEL, MAX_ATTEMPTS, MIN_SCORE, TOP_K
+from config import CHAT_MODEL, MAX_ATTEMPTS, MIN_SCORE, SCORE_MARGIN, TOP_K
 from vector import VectorStore, client
 
 ROUTES = ["search", "context", "lookup"]
@@ -98,6 +98,7 @@ def build_graph(store: VectorStore):
 
     def retrieve(s: State) -> dict:
         hits = store.search(s["query"], TOP_K, s.get("filters") or None)
+        hits = [h for h in hits if h["score"] >= hits[0]["score"] - SCORE_MARGIN]
         return {"hits": hits, "attempts": s["attempts"] + 1}
 
     def after_retrieve(s: State) -> str:
@@ -127,6 +128,7 @@ def build_graph(store: VectorStore):
         text = chat(
             "You are an IT incident advisor. Answer only from the incidents and facts provided. "
             "Cite incident ids in square brackets like [INC0001]. Never invent names, dates or hours. "
+            "Mention every provided incident that is relevant, and when several share a cause say which is the most recent. "
             "If asked how big a fix is, base the estimate on the hours spent and the fix described in "
             "these incidents and say it is an estimate. When asked how long it took a person (for example 'them' or 'that person' after a who question), "
             "give the hours of that person's incident, not the average. If the data does not answer the question, say you do not know.",
@@ -140,15 +142,19 @@ def build_graph(store: VectorStore):
         return {"answer": text, "history": history, "last_hits": s["hits"]}
 
     def suggest(s: State) -> dict:
-        out = chat(
-            "Suggest 3 short follow-up questions the user could ask next. Each must be answerable from "
-            "past incident data: other similar incidents, who resolved them and when, hours spent, "
-            "what the fix was. Do not repeat questions already asked.",
-            f"Chat so far:\n{render_history(s['history'])}",
-            {"type": "object", "properties": {"questions": {"type": "array", "items": {"type": "string"}}},
-             "required": ["questions"]},
-        )
-        return {"followups": out["questions"][:3]}
+        hits = s["hits"]
+        cause = hits[0]["root_cause"].lower()
+        done = sorted((h for h in hits if h["resolved_date"]), key=lambda h: h["resolved_date"], reverse=True)
+        pool = [f"Who was the last person to work on {cause}?"]
+        if done:
+            pool.append(f"How many hours did {done[0]['incident_id']} take?")
+        pool += [
+            f"What was done to fix {cause} previously?",
+            "How big a fix is this?",
+            f"Show me other incidents like {hits[0]['incident_id']}",
+        ]
+        asked = {m["content"].lower() for m in s["history"] if m["role"] == "user"}
+        return {"followups": [q for q in pool if q.lower() not in asked][:3]}
 
     def no_answer(s: State) -> dict:
         text = "I could not find a relevant past incident for that question."

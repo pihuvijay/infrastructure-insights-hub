@@ -36,17 +36,29 @@ def chat_evals(app) -> None:
     print(f"\nconversation: {ok}/{len(CHAT)}")
 
 
+def extras_check(app) -> None:
+    r = ask(app, "Users see a certificate warning when logging in", "eval-noise")
+    ids = [h["incident_id"] for h in r["hits"]]
+    clean = ids and set(ids) <= {"INC0001", "INC0011"}
+    print(f"{'OK ' if clean else 'MISS'} no unrelated incidents in the context: {ids}")
+    r = ask(app, "How do we cook pasta?", "eval-offtopic")
+    ans = r["answer"].lower()
+    refused = "could not find" in ans or "do not know" in ans or "don't know" in ans
+    print(f"{'OK ' if refused else 'MISS'} off-topic question is refused: {r['answer'][:90]!r}")
+
+
 def main() -> None:
     store = VectorStore.load() or VectorStore.build(to_chunks(INCIDENTS))
     app = build_graph(store)
     hit_at_1 = hit_at_k = 0
     for q, expected in QUESTIONS:
-        ids = [h["incident_id"] for h in ask(app, q, f"eval-{q}")["hits"]]
+        ids = [h["incident_id"] for h in store.search(q, 3)]
         hit_at_1 += ids[:1] == [expected]
         hit_at_k += expected in ids
         print(f"{'OK ' if expected in ids else 'MISS'} {expected} <- {ids}  | {q}")
     n = len(QUESTIONS)
-    print(f"\ntop-1: {hit_at_1}/{n}   top-{len(ids)}: {hit_at_k}/{n}\n")
+    print(f"\ntop-1: {hit_at_1}/{n}   top-3: {hit_at_k}/{n}\n")
+    extras_check(app)
     chat_evals(app)
 
 
