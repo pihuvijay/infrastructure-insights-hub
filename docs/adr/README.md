@@ -54,3 +54,4 @@ Related docs: links
 | [0024](0024-cicd-github-actions.md) | CI/CD with GitHub Actions | Accepted (runner and registry TODO) |
 | [0025](0025-observability.md) | Observability with structured logs, OpenTelemetry and agent tracing | Accepted |
 | [0026](0026-interactive-vs-batch-agents.md) | Interactive agents in the API, batch agents in the worker | Accepted |
+| [0031](0031-lora-for-rca-style.md) | LoRA fine-tuning for RCA template and style, alongside RAG | Accepted |

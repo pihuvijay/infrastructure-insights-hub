@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 260" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.t{fill:#e5e5e5;font-size:14px;text-anchor:middle}.s{fill:#8a8a8a;font-size:11px;text-anchor:middle}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 7s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35;stroke:#2dd4bf}12%{opacity:1;stroke:#fff}25%{opacity:.35}}
+</style>
+<rect width="1000" height="260" fill="#000" rx="14"/>
+<text x="500" y="28" class="t" style="font-size:18px">One RCA, from ticket to Box</text>
+<g>
+<rect x="20" y="80" width="140" height="64" rx="10" class="b a"/><text x="90" y="108" class="t">Resolved</text><text x="90" y="126" class="s">in ServiceNow</text>
+<rect x="190" y="80" width="140" height="64" rx="10" class="b a" style="animation-delay:1s"/><text x="260" y="108" class="t">Needs RCA</text><text x="260" y="126" class="s">Create RCA list</text>
+<rect x="360" y="80" width="140" height="64" rx="10" class="b a" style="animation-delay:2s"/><text x="430" y="108" class="t">Agent drafts</text><text x="430" y="126" class="s">from the ticket</text>
+<rect x="530" y="80" width="140" height="64" rx="10" class="b a" style="animation-delay:3s"/><text x="600" y="108" class="t">Engineer adds</text><text x="600" y="126" class="s">5 Whys, actions</text>
+<rect x="700" y="80" width="140" height="64" rx="10" class="b a" style="animation-delay:4s"/><text x="770" y="108" class="t">Human approves</text><text x="770" y="126" class="s">review Word doc</text>
+<rect x="870" y="80" width="110" height="64" rx="10" class="b a" style="animation-delay:5s"/><text x="925" y="108" class="t">In Box</text><text x="925" y="126" class="s">.docx stored</text>
+</g>
+<path class="l" d="M160 112H190M330 112H360M500 112H530M670 112H700M840 112H870"/>
+<path class="l" d="M925 144 V210 H430 V190"/>
+<rect x="330" y="170" width="200" height="20" rx="6" fill="none"/>
+<text x="680" y="204" class="t">feeds Insights and Search</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="7s" repeatCount="indefinite" path="M20 112 L980 112"/></circle>
+</svg>

@@ -1,5 +1,5 @@
 # ADR 0009: RAG over fine-tuning; no in-house quantisation
-Status: Accepted
+Status: Accepted (the "Do not fine-tune" decision is superseded by ADR 0031; the rest stands)
 Date: 2026-10-08
 Related docs: [rag](../architecture/rag.md), [models](../architecture/models.md), [testing](../testing.md), [agents/advisor](../architecture/agents/advisor.md)
 
