@@ -3,7 +3,7 @@
 Project: GEV System Delivery web app. Full spec: `docs/PRD.md`. Follow it; do not invent features, fields, endpoints or copy.
 
 ## Stack — do not change
-Next.js 15 (App Router) · React 19 · TypeScript strict · Tailwind v4 · shadcn/ui · TanStack Query · Recharts · Geist fonts. Backend will be **FastAPI** (LangGraph agents, RAG); it does not exist yet, so the UI uses mock data.
+Next.js 15 (App Router) · React 19 · TypeScript strict · Tailwind v4 · shadcn/ui · TanStack Query · Recharts · Geist fonts. Backend will be **FastAPI** (LangGraph Advisor agent, background jobs, RAG); it does not exist yet, so the UI uses mock data.
 Never add: TanStack Start/Router, Vite, Lovable, Supabase, another UI/CSS/chart/state library. Ask first if you think one is needed.
 
 ## Commands
@@ -47,7 +47,7 @@ Use `.devin/skills/build-feature` for any feature (checklist in `docs/checklists
 - Streaming uses SSE, not WebSockets. See docs/adr/0004-sse-over-websockets.md.
 - Vectors live in PostgreSQL with pgvector, not Pinecone or FAISS. See docs/adr/0005-postgres-pgvector.md.
 - Redis holds queue, cache and agent state; durable data never lives only in Redis. See docs/adr/0006-redis.md.
-- Agents are LangGraph nodes with a recursion limit and per-node timeouts. See docs/adr/0007-langgraph.md.
+- The Advisor is the only agent: a LangGraph graph with a recursion limit and per-node timeouts. Ingest, Embed, Cluster and Impact are background worker jobs. See docs/adr/0007-langgraph.md and docs/adr/0032-one-agent-and-background-jobs.md.
 - vLLM serves models on the GPU server. See docs/adr/0008-vllm.md.
 - Knowledge comes from RAG, not fine-tuning. See docs/adr/0009-rag-over-fine-tuning.md.
 - Slow and external work runs in the background worker; pages read from Postgres, never live from ServiceNow or Box. See docs/adr/0010-background-worker.md.
@@ -65,4 +65,4 @@ Use `.devin/skills/build-feature` for any feature (checklist in `docs/checklists
 - Ollama for local development, vLLM for staging and production; evals must pass on staging. See docs/adr/0023-ollama-local-vllm-server.md.
 - CI must pass before merge. Production deploys promote the same image that passed staging. See docs/adr/0024-cicd-github-actions.md.
 - Structured logs with request IDs, OpenTelemetry, self-hosted agent tracing. See docs/adr/0025-observability.md.
-- Interactive agents run in the API and stream over SSE; batch agents run in the worker. See docs/adr/0026-interactive-vs-batch-agents.md.
+- The Advisor runs in the API and streams over SSE; the four batch jobs run in the worker. See docs/adr/0026-interactive-vs-batch-agents.md and docs/adr/0032-one-agent-and-background-jobs.md.

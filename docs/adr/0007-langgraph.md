@@ -1,5 +1,5 @@
 # ADR 0007: LangGraph for the agent pipeline
-Status: Accepted
+Status: Accepted (the five-agents framing is superseded by ADR 0032; LangGraph for the Advisor stands)
 Date: 2026-10-08
 Related docs: [agents](../architecture/agents/README.md), [resilience](../architecture/resilience.md), [flows](../architecture/flows.md), [redis](../architecture/redis.md)
 

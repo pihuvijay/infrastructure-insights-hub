@@ -29,7 +29,7 @@ Last updated: 2026-10-08
 | idempotency | Doing an operation twice has the same effect as once, so retries are safe. |
 | incident | A ServiceNow ticket for a problem. |
 | KV cache | A model's working memory for each request; grows with concurrent requests and context length. |
-| LangGraph | The library that models agents as a graph of nodes with shared state. |
+| LangGraph | The library that models the Advisor agent as a graph of nodes with shared state. |
 | LLM | Large language model. |
 | leaky bucket / token bucket / fixed window / sliding window | Rate limiting algorithms; see [rate-limiting.md](architecture/rate-limiting.md). |
 | migration | A file describing one change to the database schema. |

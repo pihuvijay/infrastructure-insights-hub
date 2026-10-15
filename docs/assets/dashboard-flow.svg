@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.t{fill:#e5e5e5;font-size:13px;text-anchor:middle}.s{fill:#8a8a8a;font-size:10.5px;text-anchor:middle}.h{fill:#2dd4bf;font-size:12px;text-anchor:middle}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 6s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35}10%{opacity:1}25%{opacity:.35}}
+</style>
+<rect width="1000" height="300" fill="#000" rx="14"/>
+<text x="500" y="26" class="t" style="font-size:18px">Dashboard flow: pages read the database, never live systems</text>
+<rect x="20" y="110" width="140" height="60" rx="10" class="b"/><text x="90" y="136" class="t">Browser</text><text x="90" y="154" class="s">TanStack Query</text>
+<rect x="210" y="110" width="140" height="60" rx="10" class="b a"/><text x="280" y="136" class="t">Nginx</text><text x="280" y="154" class="s">TLS, rate limit</text>
+<rect x="400" y="110" width="140" height="60" rx="10" class="b a" style="animation-delay:1s"/><text x="470" y="136" class="t">FastAPI</text><text x="470" y="154" class="s">service layer</text>
+<rect x="600" y="50" width="160" height="60" rx="10" class="b a" style="animation-delay:2s"/><text x="680" y="76" class="t">Redis cache</text><text x="680" y="94" class="s">hot reads</text>
+<rect x="600" y="170" width="160" height="60" rx="10" class="b a" style="animation-delay:3s"/><text x="680" y="196" class="t">Postgres</text><text x="680" y="214" class="s">incidents, clusters, envs</text>
+<rect x="820" y="110" width="160" height="60" rx="10" class="b a" style="animation-delay:4s"/><text x="900" y="136" class="t">Page renders</text><text x="900" y="154" class="s">under 500 ms</text>
+<path class="l" d="M160 140H210M350 140H400"/><path class="l" d="M540 130 C570 130 570 80 600 80"/><path class="l" d="M540 150 C570 150 570 200 600 200"/><path class="l" d="M760 80 C800 80 800 125 820 125"/><path class="l" d="M760 200 C800 200 800 155 820 155"/>
+<text x="500" y="268" class="s">Environments, Tools, Settings, Create RCA list and Insights read only from Postgres. Only Search, the agent sidebar and RCA drafts touch vLLM.</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="5s" repeatCount="indefinite" path="M20 140 L470 140 L600 200 L900 140"/></circle>
+</svg>

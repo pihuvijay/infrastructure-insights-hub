@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.t{fill:#e5e5e5;font-size:15px;text-anchor:middle}.s{fill:#8a8a8a;font-size:11px;text-anchor:middle}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 5s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+<rect width="1000" height="300" fill="#000" rx="14"/>
+<text x="500" y="30" class="t" style="font-size:18px">Sources to insight: four background jobs, then the Advisor agent</text>
+<g class="b"><rect x="20" y="60" width="150" height="40" rx="8" class="b"/><rect x="20" y="130" width="150" height="40" rx="8" class="b"/><rect x="20" y="200" width="150" height="40" rx="8" class="b"/></g>
+<text x="95" y="85" class="t">ServiceNow</text><text x="95" y="155" class="t">Box RCAs</text><text x="95" y="225" class="t">Uploads</text>
+<path class="l" d="M170 80 C210 80 210 150 250 150"/><path class="l" d="M170 150 H250"/><path class="l" d="M170 220 C210 220 210 150 250 150"/>
+<g id="n">
+<rect x="250" y="120" width="110" height="60" rx="10" class="b a"/><text x="305" y="148" class="t">Ingest</text><text x="305" y="166" class="s">pull + sync</text>
+<rect x="400" y="120" width="110" height="60" rx="10" class="b a" style="animation-delay:.8s"/><text x="455" y="148" class="t">Embed</text><text x="455" y="166" class="s">chunk + vectors</text>
+<rect x="550" y="120" width="110" height="60" rx="10" class="b a" style="animation-delay:1.6s"/><text x="605" y="148" class="t">Cluster</text><text x="605" y="166" class="s">by root cause</text>
+<rect x="700" y="120" width="110" height="60" rx="10" class="b a" style="animation-delay:2.4s"/><text x="755" y="148" class="t">Impact</text><text x="755" y="166" class="s">hours saved</text>
+<rect x="850" y="120" width="130" height="60" rx="10" class="b a" style="animation-delay:3.2s"/><text x="915" y="148" class="t">Advisor</text><text x="915" y="166" class="s">answers + drafts</text>
+</g>
+<path class="l" d="M360 150H400M510 150H550M660 150H700M810 150H850"/>
+<path class="l" d="M755 180 V230 H700"/><path class="l" d="M915 180 V230 H870"/><path class="l" d="M915 180 V260 H640"/>
+<text x="650" y="234" class="t" style="text-anchor:end">Insights</text><text x="800" y="234" class="t" style="text-anchor:end">Search</text><text x="580" y="264" class="t" style="text-anchor:end">Create RCA drafts</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="6s" repeatCount="indefinite" path="M95 80 L250 150 L360 150 L400 150 L510 150 L550 150 L660 150 L700 150 L810 150 L850 150"/></circle>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="6s" begin="3s" repeatCount="indefinite" path="M95 220 L250 150 L360 150 L400 150 L510 150 L550 150 L660 150 L700 150 L810 150 L850 150"/></circle>
+</svg>

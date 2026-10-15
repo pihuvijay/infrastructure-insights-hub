@@ -1,12 +1,12 @@
 # Agents
 
-**Purpose:** what an agent is in this system, how the five agents fit together, and where each runs.
+**Purpose:** what an agent is in this system, how the Advisor agent and the four background jobs fit together, and where each runs.
 
 **Related ADRs:** [0007 LangGraph](../../adr/0007-langgraph.md), [0012 human review](../../adr/0012-human-review.md), [0022 model routing](../../adr/0022-model-routing.md), [0026 interactive vs batch](../../adr/0026-interactive-vs-batch-agents.md), [0009 RAG](../../adr/0009-rag-over-fine-tuning.md)
 
 Last updated: 2026-10-08
 
-Agent docs: [ingest](ingest.md), [embed](embed.md), [cluster](cluster.md), [impact](impact.md), [advisor](advisor.md). None of the agent code exists yet.
+Job and agent docs: [ingest](ingest.md), [embed](embed.md), [cluster](cluster.md), [impact](impact.md), [advisor](advisor.md). None of the agent code exists yet.
 
 ## What an agent is in this system
 
@@ -32,11 +32,15 @@ flowchart LR
   Review -->|edits| Advisor
 ```
 
-## Not every agent needs an LLM
+## Only the Advisor is an agent
+
+Ingest, Embed, Cluster and Impact are background jobs in the worker. They are described in this folder in the same format for convenience, but they are plain Python steps, not LLM agents. Only the Advisor reasons with the LLM. See [ADR 0032](../../adr/0032-one-agent-and-background-jobs.md).
+
+## Not every step needs an LLM
 
 Using the LLM only where reasoning is needed improves accuracy, speed and GPU load.
 
-| Agent | LLM? | What it really is |
+| Job or agent | LLM? | What it really is |
 |---|---|---|
 | Ingest | No | Fetch and normalise data from ServiceNow, Box and uploads. |
 | Embed | No (embedding model call) | Chunk text, call an embedding model, store vectors. |
@@ -44,7 +48,7 @@ Using the LLM only where reasoning is needed improves accuracy, speed and GPU lo
 | Impact | No | Mainly arithmetic over recorded hours. |
 | Advisor | Yes | Answers questions, powers Search, drafts RCAs. |
 
-## Where agents run
+## Where the Advisor and the jobs run
 
 - **Interactive work runs in the API process and streams over SSE:** Advisor answers in the sidebar and Search, and a single RCA draft when the user clicks.
 - **Long or batch work runs in the background worker from the queue:** Ingest, Embed, Cluster, Impact, and bulk drafting for historical incidents.

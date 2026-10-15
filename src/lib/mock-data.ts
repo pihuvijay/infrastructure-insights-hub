@@ -386,11 +386,11 @@ export const INSIGHTS: Insights = {
     { name: "Monitoring", hours: [2, 3, 1, 4, 2, 3] },
   ],
   agents: [
-    { id: "ingest", name: "Ingest", desc: "Pulls ServiceNow & Box" },
-    { id: "embed", name: "Embed", desc: "Chunks & vectorises" },
-    { id: "cluster", name: "Cluster", desc: "Groups by root cause" },
-    { id: "impact", name: "Impact", desc: "Estimates hours" },
-    { id: "advisor", name: "Advisor", desc: "Chats with you" },
+    { id: "ingest", name: "Ingest", desc: "Job: pulls ServiceNow & Box" },
+    { id: "embed", name: "Embed", desc: "Job: chunks & vectorises" },
+    { id: "cluster", name: "Cluster", desc: "Job: groups by root cause" },
+    { id: "impact", name: "Impact", desc: "Job: estimates hours" },
+    { id: "advisor", name: "Advisor agent", desc: "The agent: chats with you" },
   ],
 };
 

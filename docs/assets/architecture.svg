@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.v{fill:#050505;stroke:#005f61;stroke-width:1.5;stroke-dasharray:4 4}.t{fill:#e5e5e5;font-size:14px;text-anchor:middle}.s{fill:#8a8a8a;font-size:11px;text-anchor:middle}.h{fill:#2dd4bf;font-size:12px}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.x{stroke:#7a7a7a}
+</style>
+<rect width="1000" height="420" fill="#000" rx="14"/>
+<text x="500" y="28" class="t" style="font-size:18px">Target architecture: four on-prem VMs</text>
+<rect x="20" y="170" width="110" height="50" rx="10" class="b"/><text x="75" y="200" class="t">Browser</text>
+<path class="l" d="M130 195H180"/>
+<rect x="180" y="55" width="400" height="330" rx="14" class="v"/><text x="195" y="75" class="h">VM 1: Application server (Docker)</text>
+<rect x="200" y="165" width="90" height="60" rx="10" class="b"/><text x="245" y="200" class="t">Nginx</text>
+<rect x="340" y="95" width="210" height="60" rx="10" class="b"/><text x="445" y="123" class="t">Next.js</text><text x="445" y="141" class="s">pages</text>
+<rect x="340" y="175" width="210" height="60" rx="10" class="b"/><text x="445" y="203" class="t">FastAPI + LangGraph</text><text x="445" y="221" class="s">/api/v1, SSE streaming</text>
+<rect x="340" y="305" width="210" height="60" rx="10" class="b"/><text x="445" y="333" class="t">Background worker</text><text x="445" y="351" class="s">sync, embed, Box upload</text>
+<path class="l" d="M290 185 C310 150 320 125 340 125"/><path class="l" d="M290 195H340"/>
+<rect x="640" y="55" width="170" height="80" rx="14" class="v"/><text x="655" y="75" class="h">VM 2</text><text x="725" y="108" class="t">PostgreSQL</text><text x="725" y="124" class="s">+ pgvector</text>
+<rect x="640" y="160" width="170" height="80" rx="14" class="v"/><text x="655" y="180" class="h">VM 3</text><text x="725" y="213" class="t">Redis</text><text x="725" y="229" class="s">queue, cache, agent state</text>
+<rect x="640" y="265" width="170" height="80" rx="14" class="v"/><text x="655" y="285" class="h">VM 4 (GPU)</text><text x="725" y="318" class="t">vLLM</text><text x="725" y="334" class="s">Llama 3.1, OpenAI API</text>
+<path class="l" d="M550 195 C600 195 600 95 640 95"/><path class="l" d="M550 205H640"/><path class="l" d="M550 215 C600 215 600 305 640 305"/>
+<path class="l" d="M550 335 C600 335 620 110 640 110"/><path class="l" d="M550 340 C610 340 610 210 640 205"/>
+<rect x="870" y="285" width="110" height="40" rx="10" class="b"/><text x="925" y="310" class="t">ServiceNow</text>
+<rect x="870" y="345" width="110" height="40" rx="10" class="b"/><text x="925" y="370" class="t">Box</text>
+<path class="l" d="M550 345 H700 V370 H870"/><path class="l" d="M700 345 V305 H870"/>
+<text x="780" y="395" class="s" style="text-anchor:end">egress rate limit + circuit breaker</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="4s" repeatCount="indefinite" path="M130 195 L180 195 L290 195 L340 195 L550 205 L640 205"/></circle>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="4s" begin="2s" repeatCount="indefinite" path="M550 215 C600 215 600 305 640 305 L550 215 L340 205 L290 195 L130 195"/></circle>
+</svg>

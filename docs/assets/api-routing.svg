@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.v{fill:#050505;stroke:#005f61;stroke-width:1.5;stroke-dasharray:4 4}.t{fill:#e5e5e5;font-size:12.5px;text-anchor:middle}.s{fill:#8a8a8a;font-size:10.5px;text-anchor:middle}.h{fill:#2dd4bf;font-size:12px}.m{fill:#f59e0b;font-size:10.5px;text-anchor:middle}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 12s ease-in-out infinite}@keyframes p{0%,100%{opacity:.4}8%{opacity:1}16%{opacity:.4}}
+</style>
+<rect width="1000" height="400" fill="#000" rx="14"/>
+<text x="500" y="26" class="t" style="font-size:18px">One API call, from component to database</text>
+<rect x="15" y="44" width="560" height="150" rx="12" class="v"/><text x="30" y="62" class="h">Frontend (exists today)</text>
+<rect x="30" y="76" width="120" height="56" rx="8" class="b a"/><text x="90" y="100" class="t">View</text><text x="90" y="116" class="s">InsightsView.tsx</text>
+<rect x="165" y="76" width="120" height="56" rx="8" class="b a" style="animation-delay:1.2s"/><text x="225" y="100" class="t">Hook</text><text x="225" y="116" class="s">queries.ts</text>
+<rect x="300" y="76" width="120" height="56" rx="8" class="b a" style="animation-delay:2.4s"/><text x="360" y="100" class="t">api.ts</text><text x="360" y="116" class="s">LIVE ? http : mock</text>
+<rect x="435" y="76" width="125" height="56" rx="8" class="b a" style="animation-delay:3.6s"/><text x="497" y="100" class="t">fetch</text><text x="497" y="116" class="s">/api/v1/rca/insights</text>
+<path class="l" d="M150 104H165M285 104H300M420 104H435"/>
+<rect x="300" y="146" width="120" height="36" rx="8" class="b" style="stroke:#f59e0b"/><text x="360" y="168" class="m">mock.ts (no network)</text>
+<path class="l" d="M360 132V146" style="stroke:#f59e0b"/>
+<rect x="30" y="215" width="545" height="62" rx="12" class="v"/><text x="45" y="233" class="h">Network hop</text>
+<rect x="45" y="242" width="240" height="26" rx="6" class="b a" style="animation-delay:4.8s"/><text x="165" y="260" class="t">Dev: next.config.ts rewrite to API_URL</text>
+<rect x="305" y="242" width="255" height="26" rx="6" class="b a" style="animation-delay:5.4s"/><text x="432" y="260" class="t">Staging, prod: Nginx routes /api/v1</text>
+<path class="l" d="M497 132 V215"/>
+<rect x="600" y="44" width="385" height="330" rx="12" class="v"/><text x="615" y="62" class="h">Backend (planned, not built)</text>
+<rect x="620" y="76" width="345" height="52" rx="8" class="b a" style="animation-delay:6s"/><text x="792" y="98" class="t">api/v1: route GET /rca/insights</text><text x="792" y="116" class="s">validate, depend on session, no logic</text>
+<rect x="620" y="148" width="345" height="52" rx="8" class="b a" style="animation-delay:7.2s"/><text x="792" y="170" class="t">services: build insights</text><text x="792" y="188" class="s">queries, aggregation, cache</text>
+<rect x="620" y="220" width="345" height="52" rx="8" class="b a" style="animation-delay:8.4s"/><text x="792" y="242" class="t">models: SQLAlchemy</text><text x="792" y="260" class="s">PostgreSQL on VM 2</text>
+<rect x="620" y="292" width="345" height="52" rx="8" class="b a" style="animation-delay:9.6s"/><text x="792" y="314" class="t">schemas: Pydantic response</text><text x="792" y="332" class="s">camelCase, must match types.ts</text>
+<path class="l" d="M792 128V148M792 200V220M792 272V292"/>
+<path class="l" d="M575 245 C590 245 600 110 620 105"/>
+<text x="500" y="392" class="s">JSON goes back the same way: Pydantic, route, network, fetch, TanStack Query cache, component re-renders</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="12s" repeatCount="indefinite" path="M90 104 L225 104 L360 104 L497 104 L497 245 L600 245 L792 102 L792 174 L792 246 L792 318"/></circle>
+</svg>

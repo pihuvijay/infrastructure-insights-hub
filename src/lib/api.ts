@@ -103,6 +103,31 @@ export const api = {
   },
 };
 
+type SseEvent = { event: string; data: string };
+
+async function* sseEvents(body: ReadableStream<Uint8Array>): AsyncGenerator<SseEvent> {
+  const reader = body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    buf += dec.decode(value, { stream: !done }).replace(/\r\n/g, "\n");
+    for (let i = buf.indexOf("\n\n"); i >= 0; i = buf.indexOf("\n\n")) {
+      const block = buf.slice(0, i);
+      buf = buf.slice(i + 2);
+      let event = "message";
+      const data: string[] = [];
+      for (const line of block.split("\n")) {
+        if (line.startsWith(":")) continue;
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) data.push(line.slice(5).replace(/^ /, ""));
+      }
+      if (data.length) yield { event, data: data.join("\n") };
+    }
+    if (done) return;
+  }
+}
+
 export async function* streamChat(
   messages: ChatMsg[],
   ctx: ChatContext,
@@ -111,7 +136,7 @@ export async function* streamChat(
   if (!LIVE) return yield* mock.mockChat(messages, ctx, signal);
   const res = await fetch(`${BASE}/agent/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
     body: JSON.stringify({
       messages,
       clusterId: ctx.clusterId,
@@ -121,11 +146,10 @@ export async function* streamChat(
     signal,
   });
   if (!res.ok || !res.body) throw new Error((await res.text()) || `Request failed (${res.status})`);
-  const reader = res.body.getReader();
-  const dec = new TextDecoder();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) return;
-    yield dec.decode(value, { stream: true });
+  for await (const e of sseEvents(res.body)) {
+    if (e.event === "done") return;
+    if (e.event === "error") throw new Error((JSON.parse(e.data) as { message: string }).message);
+    yield JSON.parse(e.data) as string;
   }
+  throw new Error("Stream ended unexpectedly");
 }

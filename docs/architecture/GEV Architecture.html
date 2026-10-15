@@ -1,0 +1,669 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>GEV Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an engineering drawing set. One sheet per view, title block on top, drawings on panels, notes under each. */
+:root {
+  --bg: #eef3f3;
+  --panel: #ffffff;
+  --fg: #0e1b1d;
+  --muted: #566a6d;
+  --line: #b9c9cb;
+  --accent: #0b8a8c;
+  --accent-soft: #d8eeee;
+  --ext: #9a6200;
+  --ext-soft: #f7ecda;
+  --warn: #b3412b;
+  --warn-soft: #f7e1db;
+  --bus: #8fa5a8;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1416; --panel: #12201f; --fg: #e3eeee; --muted: #8fa6a8; --line: #2e4648;
+    --accent: #3cc2c3; --accent-soft: #123a3b; --ext: #e0a54a; --ext-soft: #3a2c14;
+    --warn: #e57a62; --warn-soft: #3f201a; --bus: #4f6b6e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1416; --panel: #12201f; --fg: #e3eeee; --muted: #8fa6a8; --line: #2e4648;
+  --accent: #3cc2c3; --accent-soft: #123a3b; --ext: #e0a54a; --ext-soft: #3a2c14;
+  --warn: #e57a62; --warn-soft: #3f201a; --bus: #4f6b6e; color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 64px; display: grid; gap: 40px; }
+
+header { display: grid; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+.eyebrow { font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(30px, 5vw, 46px)/1.05 var(--display); margin: 0; text-wrap: balance; }
+.lede { max-width: 65ch; color: var(--muted); margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; font: 12px var(--mono); color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 600; }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px; }
+nav a { font: 500 13px var(--sans); color: var(--fg); text-decoration: none; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; background: var(--panel); }
+nav a:hover, nav a:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 22px; height: 14px; border-radius: 3px; border: 1.5px solid var(--line); background: var(--panel); flex: none; }
+.sw.key { border-color: var(--accent); }
+.sw.store { background: var(--accent-soft); border-color: var(--accent); }
+.sw.ext { background: var(--ext-soft); border-color: var(--ext); }
+.sw.net { background: transparent; border: 1.5px dashed var(--accent); }
+
+section { display: grid; gap: 22px; }
+.sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+h2 { font: 700 26px/1.1 var(--display); margin: 0; }
+.sheet-no { font: 600 11px var(--mono); letter-spacing: .1em; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 2px 6px; }
+.sheet-intro { margin: 0; max-width: 70ch; color: var(--muted); }
+
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; display: grid; }
+.fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 14px 18px 0; }
+h3 { font: 600 17px var(--display); margin: 0; letter-spacing: .01em; }
+.fig-ref { font: 11px var(--mono); color: var(--muted); }
+.scroll { overflow-x: auto; padding: 8px 10px 4px; }
+.scroll svg { display: block; width: 100%; min-width: 920px; height: auto; }
+figcaption { border-top: 1px solid var(--line); padding: 12px 18px 16px; font-size: 14px; color: var(--muted); display: grid; gap: 6px; }
+figcaption strong { color: var(--fg); font-weight: 600; }
+figcaption ul { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+
+footer { font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+/* SVG drawing classes (styled from page tokens so both themes work) */
+.box { fill: var(--panel); stroke: var(--line); stroke-width: 1.2; }
+.box.key { stroke: var(--accent); stroke-width: 1.7; }
+.box.store { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.box.ext { fill: var(--ext-soft); stroke: var(--ext); stroke-width: 1.2; }
+.box.warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.4; }
+.box.band { fill: var(--accent-soft); stroke: none; }
+.vm { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.boundary { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 9 6; }
+.state { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 5 5; }
+.t { fill: var(--fg); font: 600 13px var(--sans); }
+.s { fill: var(--muted); font: 11px var(--sans); }
+.cap { fill: var(--muted); font: 600 10px var(--mono); letter-spacing: .08em; }
+.lbl { fill: var(--accent); font: 10px var(--mono); }
+.lbl.ext { fill: var(--ext); }
+.lbl.warn { fill: var(--warn); }
+.tag { fill: var(--accent); font: 600 10px var(--mono); }
+.tname { fill: var(--fg); font: 600 12px var(--mono); }
+.fld { fill: var(--fg); font: 11px var(--mono); }
+.fld.k { fill: var(--accent); }
+.edge { fill: none; stroke: var(--fg); stroke-opacity: .55; stroke-width: 1.3; }
+.edge.loop { stroke: var(--accent); stroke-opacity: 1; stroke-dasharray: 5 4; }
+.edge.egress { stroke: var(--ext); stroke-opacity: 1; stroke-width: 1.6; }
+.edge.warn { stroke: var(--warn); stroke-opacity: 1; }
+.ah { fill: var(--fg); fill-opacity: .55; }
+.ah.acc { fill: var(--accent); fill-opacity: 1; }
+.ah.ext { fill: var(--ext); fill-opacity: 1; }
+.ah.warn { fill: var(--warn); fill-opacity: 1; }
+.bus { stroke: var(--bus); stroke-width: 5; stroke-linecap: round; }
+.fw { stroke: var(--warn); stroke-width: 5; stroke-linecap: round; }
+.hdr { fill: var(--accent-soft); }
+
+@media (prefers-reduced-motion: no-preference) {
+  nav a { transition: border-color .15s, color .15s; }
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">360 Visibility · GEV System Delivery</div>
+  <h1>GEV Architecture</h1>
+  <p class="lede">How the app is put together: first the whole system and where each part runs, then the inside of the backend, the agent pipeline, the RCA lifecycle and the draft database.</p>
+  <div class="meta">
+    <span><b>Status</b> draft for review</span>
+    <span><b>Hosting</b> on-prem VMs</span>
+    <span><b>Users</b> 200–1,000 internal</span>
+    <span><b>Decisions</b> docs/adr/</span>
+  </div>
+</header>
+
+<nav aria-label="Diagrams">
+  <a href="#hld">1 · System</a>
+  <a href="#backend">2 · Backend modules</a>
+  <a href="#agents">3 · Agent pipeline</a>
+  <a href="#lifecycle">4 · RCA lifecycle</a>
+  <a href="#data">5 · Database</a>
+</nav>
+
+<div class="legend" aria-label="Legend">
+  <span><i class="sw"></i>Our code</span>
+  <span><i class="sw key"></i>Key component</span>
+  <span><i class="sw store"></i>Data store</span>
+  <span><i class="sw ext"></i>Outside the company network</span>
+  <span><i class="sw net"></i>Network or server boundary</span>
+</div>
+
+<!-- ================= HIGH LEVEL ================= -->
+<section id="hld">
+  <div class="sheet-head"><span class="sheet-no">SHEET 1</span><h2>High-level design</h2></div>
+  <p class="sheet-intro">Every part of the system, which server it runs on, and how a request travels. Data pages never wait on ServiceNow, Box or the model: they read from Postgres and Redis, which the worker keeps up to date.</p>
+
+  <figure>
+    <div class="fig-head"><h3>1 · System and servers</h3><span class="fig-ref">ADR 0001 · 0002 · 0005 · 0008 · 0010 · 0011 · 0024</span></div>
+    <div class="scroll">
+<svg viewBox="0 0 1110 640" role="img" aria-label="High-level architecture: engineers reach Nginx on the app server, which routes pages to Next.js and API calls to FastAPI. FastAPI and the worker reach Postgres, Redis and the GPU server over the internal network. Only the worker calls ServiceNow and Box, through the firewall. Below, the delivery pipeline runs from pull request to CI, registry, staging and production.">
+  <defs>
+    <marker id="h-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+    <marker id="h-e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah ext"/></marker>
+  </defs>
+
+  <!-- company network -->
+  <rect x="12" y="36" width="905" height="440" rx="10" class="boundary"/>
+  <text x="28" y="58" class="cap">COMPANY NETWORK · ON-PREM</text>
+
+  <!-- users -->
+  <rect x="30" y="205" width="125" height="72" rx="6" class="box"/>
+  <text x="92" y="232" text-anchor="middle" class="t">Engineers</text>
+  <text x="92" y="250" text-anchor="middle" class="s">browser</text>
+  <text x="92" y="264" text-anchor="middle" class="s">200–1,000 users</text>
+
+  <!-- VM1 -->
+  <rect x="185" y="72" width="430" height="380" rx="8" class="vm"/>
+  <text x="200" y="92" class="cap">VM 1 · APP SERVER · DOCKER</text>
+
+  <rect x="205" y="205" width="120" height="72" rx="6" class="box key"/>
+  <text x="265" y="232" text-anchor="middle" class="t">Nginx</text>
+  <text x="265" y="250" text-anchor="middle" class="s">HTTPS · routing</text>
+  <text x="265" y="264" text-anchor="middle" class="s">rate limits</text>
+
+  <rect x="365" y="105" width="230" height="62" rx="6" class="box"/>
+  <text x="480" y="131" text-anchor="middle" class="t">Next.js frontend</text>
+  <text x="480" y="149" text-anchor="middle" class="s">pages · TanStack Query</text>
+
+  <rect x="365" y="200" width="230" height="92" rx="6" class="box key"/>
+  <text x="480" y="226" text-anchor="middle" class="t">FastAPI</text>
+  <text x="480" y="244" text-anchor="middle" class="s">/api/v1 · sign-in · SSE streaming</text>
+  <text x="480" y="258" text-anchor="middle" class="s">interactive agents (Advisor)</text>
+  <text x="480" y="272" text-anchor="middle" class="s">Pydantic validation</text>
+
+  <rect x="365" y="345" width="230" height="72" rx="6" class="box"/>
+  <text x="480" y="371" text-anchor="middle" class="t">Worker</text>
+  <text x="480" y="389" text-anchor="middle" class="s">ServiceNow &amp; Box sync · uploads</text>
+  <text x="480" y="403" text-anchor="middle" class="s">embed · cluster · impact jobs</text>
+
+  <!-- request path -->
+  <line x1="155" y1="241" x2="203" y2="241" class="edge" marker-end="url(#h-a)"/>
+  <text x="179" y="233" text-anchor="middle" class="lbl">HTTPS</text>
+  <path d="M325,225 H345 V136 H363" class="edge" marker-end="url(#h-a)"/>
+  <text x="353" y="130" text-anchor="middle" class="lbl">/</text>
+  <line x1="325" y1="246" x2="363" y2="246" class="edge" marker-end="url(#h-a)"/>
+  <text x="344" y="239" text-anchor="middle" class="lbl">/api</text>
+
+  <!-- internal network bus -->
+  <line x1="640" y1="110" x2="640" y2="420" class="bus"/>
+  <text x="640" y="438" text-anchor="middle" class="cap">INTERNAL NETWORK</text>
+  <line x1="595" y1="246" x2="638" y2="246" class="edge"/>
+  <line x1="595" y1="381" x2="638" y2="381" class="edge"/>
+  <line x1="642" y1="118" x2="683" y2="118" class="edge" marker-end="url(#h-a)"/>
+  <line x1="642" y1="246" x2="683" y2="246" class="edge" marker-end="url(#h-a)"/>
+  <line x1="642" y1="386" x2="683" y2="386" class="edge" marker-end="url(#h-a)"/>
+
+  <!-- data VMs -->
+  <rect x="685" y="72" width="215" height="92" rx="6" class="box store"/>
+  <text x="697" y="90" class="cap">VM 2</text>
+  <text x="792" y="114" text-anchor="middle" class="t">PostgreSQL + pgvector</text>
+  <text x="792" y="132" text-anchor="middle" class="s">incidents · RCAs · vectors</text>
+  <text x="792" y="146" text-anchor="middle" class="s">via SQLAlchemy · Alembic</text>
+
+  <rect x="685" y="200" width="215" height="92" rx="6" class="box store"/>
+  <text x="697" y="218" class="cap">VM 3</text>
+  <text x="792" y="242" text-anchor="middle" class="t">Redis</text>
+  <text x="792" y="260" text-anchor="middle" class="s">job queue · cache</text>
+  <text x="792" y="274" text-anchor="middle" class="s">agent state · rate-limit counts</text>
+
+  <rect x="685" y="340" width="215" height="92" rx="6" class="box store"/>
+  <text x="697" y="358" class="cap">VM 4 · GPU</text>
+  <text x="792" y="382" text-anchor="middle" class="t">vLLM</text>
+  <text x="792" y="400" text-anchor="middle" class="s">LLM + embedding model</text>
+  <text x="792" y="414" text-anchor="middle" class="s">OpenAI-compatible API</text>
+
+  <!-- egress: ServiceNow is read-only (data flows in), Box is read and write (both ways) -->
+  <path d="M953,283 H935 V458 H500 V419" class="edge egress" marker-end="url(#h-e)"/>
+  <text x="790" y="452" text-anchor="middle" class="lbl ext">ServiceNow → worker: pulls incidents, never writes</text>
+  <path d="M953,383 H925 V468 H460 V419" class="edge egress" marker-start="url(#h-e)" marker-end="url(#h-e)"/>
+  <text x="690" y="486" text-anchor="middle" class="lbl ext">worker ⇄ Box: reads old RCAs, uploads new ones</text>
+  <line x1="917" y1="450" x2="917" y2="474" class="fw"/>
+  <text x="917" y="504" text-anchor="middle" class="lbl warn">firewall</text>
+
+  <!-- external -->
+  <text x="1025" y="236" text-anchor="middle" class="cap">OUTSIDE · SAAS</text>
+  <rect x="955" y="250" width="140" height="66" rx="6" class="box ext"/>
+  <text x="1025" y="278" text-anchor="middle" class="t">ServiceNow</text>
+  <text x="1025" y="296" text-anchor="middle" class="s">read only</text>
+  <rect x="955" y="350" width="140" height="66" rx="6" class="box ext"/>
+  <text x="1025" y="378" text-anchor="middle" class="t">Box</text>
+  <text x="1025" y="396" text-anchor="middle" class="s">read + write</text>
+
+  <!-- delivery pipeline -->
+  <text x="30" y="526" class="cap">DELIVERY PIPELINE</text>
+  <rect x="30" y="540" width="150" height="62" rx="6" class="box"/>
+  <text x="105" y="566" text-anchor="middle" class="t">Pull request</text>
+  <text x="105" y="584" text-anchor="middle" class="s">branch · review</text>
+  <rect x="230" y="540" width="190" height="62" rx="6" class="box key"/>
+  <text x="325" y="566" text-anchor="middle" class="t">GitHub Actions CI</text>
+  <text x="325" y="584" text-anchor="middle" class="s">lint · tests · build images</text>
+  <rect x="470" y="540" width="170" height="62" rx="6" class="box"/>
+  <text x="555" y="566" text-anchor="middle" class="t">Registry</text>
+  <text x="555" y="584" text-anchor="middle" class="s">image tagged by commit</text>
+  <rect x="690" y="540" width="170" height="62" rx="6" class="box"/>
+  <text x="775" y="566" text-anchor="middle" class="t">Staging VM</text>
+  <text x="775" y="584" text-anchor="middle" class="s">auto deploy · smoke tests</text>
+  <rect x="910" y="540" width="180" height="62" rx="6" class="box"/>
+  <text x="1000" y="566" text-anchor="middle" class="t">Production VMs</text>
+  <text x="1000" y="584" text-anchor="middle" class="s">same image · approval</text>
+  <line x1="180" y1="571" x2="228" y2="571" class="edge" marker-end="url(#h-a)"/>
+  <text x="204" y="563" text-anchor="middle" class="lbl">push</text>
+  <line x1="420" y1="571" x2="468" y2="571" class="edge" marker-end="url(#h-a)"/>
+  <text x="444" y="563" text-anchor="middle" class="lbl">green</text>
+  <line x1="640" y1="571" x2="688" y2="571" class="edge" marker-end="url(#h-a)"/>
+  <text x="664" y="563" text-anchor="middle" class="lbl">deploy</text>
+  <line x1="860" y1="571" x2="908" y2="571" class="edge" marker-end="url(#h-a)"/>
+  <text x="884" y="563" text-anchor="middle" class="lbl">promote</text>
+  <text x="560" y="626" text-anchor="middle" class="s">Deploys run from a self-hosted runner inside the network (to confirm with IT).</text>
+</svg>
+    </div>
+    <figcaption>
+      <span><strong>Read it left to right.</strong> Every request enters through Nginx. Pages go to Next.js, data calls go to FastAPI, and FastAPI answers from Postgres and Redis.</span>
+      <ul>
+        <li><strong>ServiceNow is read only:</strong> the worker pulls incidents in and never changes anything there.</li>
+        <li><strong>Box goes both ways:</strong> the worker reads the existing RCA documents (for search and patterns) and uploads each newly approved RCA.</li>
+        <li>Only the worker talks to ServiceNow and Box, always through rate limits and a circuit breaker, so a slow or broken outside service never slows a page.</li>
+        <li>The GPU server is only used by AI features. If it is down, AI shows as unavailable and every other page keeps working.</li>
+        <li>Production promotes the exact image that passed staging; nothing is rebuilt.</li>
+      </ul>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ================= LOW LEVEL ================= -->
+<section>
+  <div class="sheet-head"><span class="sheet-no">SHEET 2</span><h2>Low-level design</h2></div>
+  <p class="sheet-intro">The inside of the backend: which folder owns what, how the agents hand work to each other, how an RCA moves from "Needs RCA" to "In Box", and the draft tables behind it all.</p>
+
+  <!-- Backend modules -->
+  <figure id="backend">
+    <div class="fig-head"><h3>2 · Backend modules</h3><span class="fig-ref">backend/app/ · ADR 0003 · 0019 · 0020</span></div>
+    <div class="scroll">
+<svg viewBox="0 0 1100 600" role="img" aria-label="Backend modules: HTTP requests enter api/v1 routes and jobs enter workers. Both call services, where all business logic lives. Routes validate through Pydantic schemas. Services run agents, call integration clients and read and write models. Agents call vLLM, integrations call ServiceNow and Box, models talk to Postgres. Services enqueue to and cache in Redis. The core module is shared by all.">
+  <defs>
+    <marker id="b-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+  </defs>
+
+  <text x="230" y="72" text-anchor="middle" class="cap">HTTP REQUEST FROM NGINX</text>
+  <line x1="230" y1="78" x2="230" y2="98" class="edge" marker-end="url(#b-a)"/>
+
+  <rect x="80" y="100" width="300" height="62" rx="6" class="box"/>
+  <text x="230" y="126" text-anchor="middle" class="t">api/v1/</text>
+  <text x="230" y="144" text-anchor="middle" class="s">routes: parse, check sign-in, return</text>
+
+  <rect x="620" y="100" width="280" height="62" rx="6" class="box"/>
+  <text x="760" y="126" text-anchor="middle" class="t">workers/</text>
+  <text x="760" y="144" text-anchor="middle" class="s">scheduled and queued jobs</text>
+
+  <rect x="950" y="100" width="130" height="62" rx="6" class="box store"/>
+  <text x="1015" y="126" text-anchor="middle" class="t">Redis</text>
+  <text x="1015" y="144" text-anchor="middle" class="s">queue · cache</text>
+  <line x1="950" y1="131" x2="902" y2="131" class="edge" marker-end="url(#b-a)"/>
+  <text x="926" y="124" text-anchor="middle" class="lbl">jobs</text>
+
+  <rect x="20" y="215" width="230" height="62" rx="6" class="box"/>
+  <text x="135" y="241" text-anchor="middle" class="t">schemas/</text>
+  <text x="135" y="259" text-anchor="middle" class="s">Pydantic shapes · RCA template</text>
+
+  <rect x="300" y="215" width="500" height="62" rx="6" class="box key"/>
+  <text x="550" y="241" text-anchor="middle" class="t">services/</text>
+  <text x="550" y="259" text-anchor="middle" class="s">business logic: every rule lives here, once</text>
+
+  <path d="M130,162 V213" class="edge" marker-end="url(#b-a)"/>
+  <text x="138" y="192" class="lbl">validate in / out</text>
+  <path d="M300,162 V188 H420 V213" class="edge" marker-end="url(#b-a)"/>
+  <text x="362" y="182" text-anchor="middle" class="lbl">call</text>
+  <path d="M760,162 V188 H680 V213" class="edge" marker-end="url(#b-a)"/>
+  <text x="720" y="182" text-anchor="middle" class="lbl">call</text>
+  <path d="M800,246 H1015 V164" class="edge" marker-end="url(#b-a)"/>
+  <text x="905" y="239" text-anchor="middle" class="lbl">enqueue · cache</text>
+
+  <rect x="60" y="345" width="280" height="70" rx="6" class="box key"/>
+  <text x="200" y="371" text-anchor="middle" class="t">agents/</text>
+  <text x="200" y="389" text-anchor="middle" class="s">one LangGraph graph per job</text>
+  <text x="200" y="403" text-anchor="middle" class="s">Ingest · Embed · Cluster · Impact · Advisor</text>
+
+  <rect x="410" y="345" width="280" height="70" rx="6" class="box"/>
+  <text x="550" y="371" text-anchor="middle" class="t">integrations/</text>
+  <text x="550" y="389" text-anchor="middle" class="s">ServiceNow and Box clients</text>
+  <text x="550" y="403" text-anchor="middle" class="s">timeout · limiter · breaker · retry</text>
+
+  <rect x="760" y="345" width="280" height="70" rx="6" class="box"/>
+  <text x="900" y="371" text-anchor="middle" class="t">models/</text>
+  <text x="900" y="389" text-anchor="middle" class="s">SQLAlchemy tables</text>
+  <text x="900" y="403" text-anchor="middle" class="s">changed only through Alembic</text>
+
+  <path d="M380,277 V311 H200 V343" class="edge" marker-end="url(#b-a)"/>
+  <text x="290" y="305" text-anchor="middle" class="lbl">run graph</text>
+  <path d="M550,277 V343" class="edge" marker-end="url(#b-a)"/>
+  <text x="558" y="315" class="lbl">call client</text>
+  <path d="M720,277 V311 H900 V343" class="edge" marker-end="url(#b-a)"/>
+  <text x="810" y="305" text-anchor="middle" class="lbl">read / write</text>
+
+  <rect x="100" y="470" width="200" height="56" rx="6" class="box store"/>
+  <text x="200" y="494" text-anchor="middle" class="t">vLLM</text>
+  <text x="200" y="511" text-anchor="middle" class="s">LLM + embeddings</text>
+  <rect x="410" y="470" width="130" height="56" rx="6" class="box ext"/>
+  <text x="475" y="494" text-anchor="middle" class="t">ServiceNow</text>
+  <text x="475" y="511" text-anchor="middle" class="s">incidents</text>
+  <rect x="560" y="470" width="130" height="56" rx="6" class="box ext"/>
+  <text x="625" y="494" text-anchor="middle" class="t">Box</text>
+  <text x="625" y="511" text-anchor="middle" class="s">RCA documents</text>
+  <rect x="800" y="470" width="200" height="56" rx="6" class="box store"/>
+  <text x="900" y="494" text-anchor="middle" class="t">PostgreSQL + pgvector</text>
+  <text x="900" y="511" text-anchor="middle" class="s">tables + vectors</text>
+
+  <path d="M200,415 V468" class="edge" marker-end="url(#b-a)"/>
+  <text x="208" y="446" class="lbl">prompts</text>
+  <path d="M475,468 V417" class="edge" marker-end="url(#b-a)"/>
+  <text x="483" y="446" class="lbl">read only</text>
+  <path d="M625,417 V468" class="edge" marker-start="url(#b-a)" marker-end="url(#b-a)"/>
+  <text x="633" y="446" class="lbl">read + write</text>
+  <path d="M900,415 V468" class="edge" marker-end="url(#b-a)"/>
+  <text x="908" y="446" class="lbl">SQL in a session</text>
+
+  <rect x="20" y="548" width="1060" height="40" rx="6" class="box band"/>
+  <text x="550" y="573" text-anchor="middle" class="t">core/  ·  settings from .env  ·  DB engine and sessions  ·  sign-in  ·  logging and tracing  ·  shared by every module</text>
+</svg>
+    </div>
+    <figcaption>
+      <span><strong>One rule makes this work:</strong> routes and workers are thin doors, and services are the only place logic lives. A sync job and an API call that do the same thing call the same service.</span>
+      <ul>
+        <li>Agents get their data through services, never straight from tables.</li>
+        <li>Every outside call goes through integrations/, which adds the timeout, rate limit, circuit breaker and retry. The ServiceNow client only has read methods; the Box client can read and upload.</li>
+      </ul>
+    </figcaption>
+  </figure>
+
+  <!-- Agent pipeline -->
+  <figure id="agents">
+    <div class="fig-head"><h3>3 · Agent pipeline</h3><span class="fig-ref">ADR 0007 · 0009 · 0012 · 0022 · 0026</span></div>
+    <div class="scroll">
+<svg viewBox="0 0 1100 510" role="img" aria-label="Agent pipeline in two lanes. Batch lane in the worker: Ingest, Embed, Cluster and Impact run in order and each writes to Postgres with pgvector. Interactive lane in the API: a question is answered by Retrieve, then Reason, which can loop back to search again, then the answer streams over SSE. When drafting an RCA, Reason produces a draft, the graph pauses for human review, and only an approved RCA becomes an upload job.">
+  <defs>
+    <marker id="g-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+    <marker id="g-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah acc"/></marker>
+  </defs>
+
+  <text x="40" y="44" class="cap">BATCH LANE · RUNS IN THE WORKER · ON A SCHEDULE OR NEW DATA</text>
+
+  <rect x="40" y="58" width="200" height="80" rx="6" class="box"/>
+  <text x="140" y="84" text-anchor="middle" class="t">Ingest</text>
+  <text x="140" y="102" text-anchor="middle" class="s">pull ServiceNow, Box, uploads</text>
+  <text x="140" y="124" text-anchor="middle" class="tag">no LLM</text>
+
+  <rect x="310" y="58" width="200" height="80" rx="6" class="box"/>
+  <text x="410" y="84" text-anchor="middle" class="t">Embed</text>
+  <text x="410" y="102" text-anchor="middle" class="s">split into chunks → vectors</text>
+  <text x="410" y="124" text-anchor="middle" class="tag">embedding model</text>
+
+  <rect x="580" y="58" width="200" height="80" rx="6" class="box"/>
+  <text x="680" y="84" text-anchor="middle" class="t">Cluster</text>
+  <text x="680" y="102" text-anchor="middle" class="s">group by root cause</text>
+  <text x="680" y="124" text-anchor="middle" class="tag">LLM names the groups</text>
+
+  <rect x="850" y="58" width="200" height="80" rx="6" class="box"/>
+  <text x="950" y="84" text-anchor="middle" class="t">Impact</text>
+  <text x="950" y="102" text-anchor="middle" class="s">hours spent · hours savable</text>
+  <text x="950" y="124" text-anchor="middle" class="tag">no LLM: arithmetic</text>
+
+  <line x1="240" y1="98" x2="308" y2="98" class="edge" marker-end="url(#g-a)"/>
+  <text x="274" y="91" text-anchor="middle" class="lbl">records</text>
+  <line x1="510" y1="98" x2="578" y2="98" class="edge" marker-end="url(#g-a)"/>
+  <text x="544" y="91" text-anchor="middle" class="lbl">vectors</text>
+  <line x1="780" y1="98" x2="848" y2="98" class="edge" marker-end="url(#g-a)"/>
+  <text x="814" y="91" text-anchor="middle" class="lbl">clusters</text>
+
+  <rect x="40" y="176" width="1010" height="34" rx="6" class="box store"/>
+  <text x="545" y="198" text-anchor="middle" class="t">PostgreSQL + pgvector  ·  incidents · RCAs · chunks with vectors · clusters</text>
+  <line x1="140" y1="138" x2="140" y2="174" class="edge" marker-end="url(#g-a)"/>
+  <line x1="410" y1="138" x2="410" y2="174" class="edge" marker-end="url(#g-a)"/>
+  <line x1="680" y1="138" x2="680" y2="174" class="edge" marker-end="url(#g-a)"/>
+  <line x1="950" y1="138" x2="950" y2="174" class="edge" marker-end="url(#g-a)"/>
+  <text x="148" y="161" class="lbl">write</text>
+
+  <text x="40" y="250" class="cap">INTERACTIVE LANE · RUNS IN THE API · STREAMS OVER SSE</text>
+
+  <rect x="40" y="290" width="170" height="64" rx="6" class="box"/>
+  <text x="125" y="316" text-anchor="middle" class="t">Question</text>
+  <text x="125" y="334" text-anchor="middle" class="s">+ tagged chart or cluster</text>
+
+  <rect x="270" y="290" width="200" height="64" rx="6" class="box"/>
+  <text x="370" y="316" text-anchor="middle" class="t">Retrieve</text>
+  <text x="370" y="334" text-anchor="middle" class="s">pgvector + SQL filters</text>
+
+  <rect x="530" y="290" width="200" height="64" rx="6" class="box key"/>
+  <text x="630" y="316" text-anchor="middle" class="t">Reason</text>
+  <text x="630" y="334" text-anchor="middle" class="s">vLLM · loop limit · timeout</text>
+
+  <rect x="790" y="290" width="200" height="64" rx="6" class="box"/>
+  <text x="890" y="316" text-anchor="middle" class="t">Stream answer</text>
+  <text x="890" y="334" text-anchor="middle" class="s">SSE · Stop cancels the run</text>
+
+  <line x1="210" y1="322" x2="268" y2="322" class="edge" marker-end="url(#g-a)"/>
+  <line x1="470" y1="322" x2="528" y2="322" class="edge" marker-end="url(#g-a)"/>
+  <text x="499" y="315" text-anchor="middle" class="lbl">context</text>
+  <line x1="730" y1="322" x2="788" y2="322" class="edge" marker-end="url(#g-a)"/>
+  <text x="759" y="315" text-anchor="middle" class="lbl">tokens</text>
+
+  <line x1="300" y1="210" x2="300" y2="288" class="edge" marker-end="url(#g-a)"/>
+  <text x="308" y="236" class="lbl">read</text>
+  <path d="M630,290 V272 H430 V288" class="edge loop" marker-end="url(#g-l)"/>
+  <text x="530" y="266" text-anchor="middle" class="lbl">not enough? search again</text>
+
+  <rect x="530" y="390" width="200" height="64" rx="6" class="box"/>
+  <text x="630" y="416" text-anchor="middle" class="t">RCA draft</text>
+  <text x="630" y="434" text-anchor="middle" class="s">fills every template section</text>
+
+  <rect x="780" y="390" width="150" height="64" rx="6" class="box key"/>
+  <text x="855" y="416" text-anchor="middle" class="t">Human review</text>
+  <text x="855" y="434" text-anchor="middle" class="s">graph pauses</text>
+
+  <rect x="990" y="390" width="100" height="64" rx="6" class="box"/>
+  <text x="1040" y="416" text-anchor="middle" class="t">Upload job</text>
+  <text x="1040" y="434" text-anchor="middle" class="s">queued, retried</text>
+
+  <line x1="630" y1="354" x2="630" y2="388" class="edge" marker-end="url(#g-a)"/>
+  <text x="638" y="376" class="lbl">when drafting</text>
+  <line x1="730" y1="422" x2="778" y2="422" class="edge" marker-end="url(#g-a)"/>
+  <text x="754" y="415" text-anchor="middle" class="lbl">pause</text>
+  <line x1="930" y1="422" x2="988" y2="422" class="edge" marker-end="url(#g-a)"/>
+  <text x="959" y="415" text-anchor="middle" class="lbl">approved</text>
+
+  <rect x="40" y="472" width="1050" height="26" rx="5" class="state"/>
+  <text x="565" y="489" text-anchor="middle" class="s">LangGraph state travels with each run and is checkpointed in Redis, so a run can resume after a failure</text>
+</svg>
+    </div>
+    <figcaption>
+      <span><strong>Two lanes, one store.</strong> The batch lane keeps the knowledge up to date; the interactive lane answers people. They meet only in Postgres.</span>
+      <ul>
+        <li>Only Cluster, Reason and drafting use the LLM. Ingest and Impact are plain code, which keeps them fast and exact.</li>
+        <li>The same embedding model is used everywhere; changing it means re-embedding every chunk.</li>
+        <li>Nothing reaches Box without a person approving it.</li>
+      </ul>
+    </figcaption>
+  </figure>
+
+  <!-- RCA lifecycle -->
+  <figure id="lifecycle">
+    <div class="fig-head"><h3>4 · RCA lifecycle</h3><span class="fig-ref">ADR 0010 · 0012 · 0015</span></div>
+    <div class="scroll">
+<svg viewBox="0 0 1050 230" role="img" aria-label="RCA status lifecycle: Needs RCA becomes Draft when the AI pre-fills it. Draft stays Draft as edits are saved, and becomes Approved when an engineer approves. Approved becomes Uploading when the upload is queued, and In Box when Box confirms. A Box error moves Uploading to Upload failed, which retries with backoff back to Uploading.">
+  <defs>
+    <marker id="l-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+    <marker id="l-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah warn"/></marker>
+    <marker id="l-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah acc"/></marker>
+  </defs>
+
+  <rect x="20" y="60" width="150" height="50" rx="25" class="box"/>
+  <text x="95" y="90" text-anchor="middle" class="t">Needs RCA</text>
+  <rect x="235" y="60" width="150" height="50" rx="25" class="box"/>
+  <text x="310" y="90" text-anchor="middle" class="t">Draft</text>
+  <rect x="450" y="60" width="150" height="50" rx="25" class="box"/>
+  <text x="525" y="90" text-anchor="middle" class="t">Approved</text>
+  <rect x="665" y="60" width="150" height="50" rx="25" class="box"/>
+  <text x="740" y="90" text-anchor="middle" class="t">Uploading</text>
+  <rect x="880" y="60" width="150" height="50" rx="25" class="box key"/>
+  <text x="955" y="90" text-anchor="middle" class="t">In Box</text>
+
+  <line x1="170" y1="85" x2="233" y2="85" class="edge" marker-end="url(#l-a)"/>
+  <text x="202" y="48" text-anchor="middle" class="lbl">AI pre-fills</text>
+  <line x1="385" y1="85" x2="448" y2="85" class="edge" marker-end="url(#l-a)"/>
+  <text x="417" y="48" text-anchor="middle" class="lbl">engineer approves</text>
+  <line x1="600" y1="85" x2="663" y2="85" class="edge" marker-end="url(#l-a)"/>
+  <text x="632" y="48" text-anchor="middle" class="lbl">upload queued</text>
+  <line x1="815" y1="85" x2="878" y2="85" class="edge" marker-end="url(#l-a)"/>
+  <text x="847" y="48" text-anchor="middle" class="lbl">Box confirms</text>
+
+  <path d="M290,60 C290,24 330,24 330,58" class="edge loop" marker-end="url(#l-c)"/>
+  <text x="310" y="18" text-anchor="middle" class="lbl">edits saved</text>
+
+  <rect x="665" y="165" width="150" height="50" rx="25" class="box warn"/>
+  <text x="740" y="195" text-anchor="middle" class="t">Upload failed</text>
+  <path d="M770,110 V163" class="edge warn" marker-end="url(#l-w)"/>
+  <text x="778" y="141" class="lbl warn">Box error</text>
+  <path d="M710,165 V112" class="edge" marker-end="url(#l-a)"/>
+  <text x="702" y="141" text-anchor="end" class="lbl">retry with backoff</text>
+</svg>
+    </div>
+    <figcaption>
+      <span><strong>An RCA is saved in Postgres before it is ever queued for Box.</strong> If Box fails, the job retries until it succeeds, and a retried upload never creates a second copy. Failed uploads stay visible; nothing is dropped silently.</span>
+    </figcaption>
+  </figure>
+
+  <!-- Database -->
+  <figure id="data">
+    <div class="fig-head"><h3>5 · Database (draft)</h3><span class="fig-ref">backend/app/models/ · ADR 0005</span></div>
+    <div class="scroll">
+<svg viewBox="0 0 1100 390" role="img" aria-label="Draft database tables. Each incident has one RCA, and each RCA has up to six corrective actions. Many incidents belong to one cluster. Chunks hold text and an embedding vector and point back to their source incident, RCA or upload. Each environment has many snapshots, and each snapshot records the user who applied it.">
+  <defs>
+    <marker id="d-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker>
+  </defs>
+
+  <!-- incidents: 8 fields, h=26+128+10=164 -->
+  <rect x="30" y="30" width="210" height="164" rx="5" class="box"/>
+  <path d="M30,56 V35 Q30,30 35,30 H235 Q240,30 240,35 V56 Z" class="hdr"/>
+  <text x="42" y="48" class="tname">incidents</text>
+  <text x="42" y="72" class="fld k">id  PK</text>
+  <text x="42" y="88" class="fld">number · priority</text>
+  <text x="42" y="104" class="fld">opened_at · resolved_at</text>
+  <text x="42" y="120" class="fld">hours_taken</text>
+  <text x="42" y="136" class="fld">assignee</text>
+  <text x="42" y="152" class="fld">root_cause_code</text>
+  <text x="42" y="168" class="fld">description</text>
+  <text x="42" y="184" class="fld k">cluster_id  FK</text>
+
+  <!-- rcas: 7 fields, h=148 -->
+  <rect x="320" y="30" width="210" height="148" rx="5" class="box key"/>
+  <path d="M320,56 V35 Q320,30 325,30 H525 Q530,30 530,35 V56 Z" class="hdr"/>
+  <text x="332" y="48" class="tname">rcas</text>
+  <text x="332" y="72" class="fld k">id  PK</text>
+  <text x="332" y="88" class="fld k">incident_id  FK</text>
+  <text x="332" y="104" class="fld">status</text>
+  <text x="332" y="120" class="fld">sections  JSON</text>
+  <text x="332" y="136" class="fld">ai_filled_fields</text>
+  <text x="332" y="152" class="fld">approved_by · approved_at</text>
+  <text x="332" y="168" class="fld">box_file_id</text>
+
+  <!-- corrective actions: 5 fields, h=116 -->
+  <rect x="610" y="30" width="210" height="116" rx="5" class="box"/>
+  <path d="M610,56 V35 Q610,30 615,30 H815 Q820,30 820,35 V56 Z" class="hdr"/>
+  <text x="622" y="48" class="tname">rca_actions</text>
+  <text x="622" y="72" class="fld k">id  PK</text>
+  <text x="622" y="88" class="fld k">rca_id  FK</text>
+  <text x="622" y="104" class="fld">number  (1–6)</text>
+  <text x="622" y="120" class="fld">action · owner</text>
+  <text x="622" y="136" class="fld">due_date · state</text>
+
+  <!-- users: 5 fields -->
+  <rect x="880" y="30" width="190" height="116" rx="5" class="box"/>
+  <path d="M880,56 V35 Q880,30 885,30 H1065 Q1070,30 1070,35 V56 Z" class="hdr"/>
+  <text x="892" y="48" class="tname">users</text>
+  <text x="892" y="72" class="fld k">id  PK</text>
+  <text x="892" y="88" class="fld">email · name</text>
+  <text x="892" y="104" class="fld">line_manager_id</text>
+  <text x="892" y="120" class="fld">widgets  JSON</text>
+  <text x="892" y="136" class="fld">bookmarks  JSON</text>
+
+  <!-- clusters: 5 fields -->
+  <rect x="30" y="240" width="210" height="116" rx="5" class="box"/>
+  <path d="M30,266 V245 Q30,240 35,240 H235 Q240,240 240,245 V266 Z" class="hdr"/>
+  <text x="42" y="258" class="tname">clusters</text>
+  <text x="42" y="282" class="fld k">id  PK</text>
+  <text x="42" y="298" class="fld">name</text>
+  <text x="42" y="314" class="fld">incident_count</text>
+  <text x="42" y="330" class="fld">hours_spent</text>
+  <text x="42" y="346" class="fld">hours_savable</text>
+
+  <!-- chunks: 6 fields, h=132 -->
+  <rect x="320" y="240" width="210" height="132" rx="5" class="box store"/>
+  <path d="M320,266 V245 Q320,240 325,240 H525 Q530,240 530,245 V266 Z" class="hdr"/>
+  <text x="332" y="258" class="tname">chunks</text>
+  <text x="332" y="282" class="fld k">id  PK</text>
+  <text x="332" y="298" class="fld">source  incident|rca|upload</text>
+  <text x="332" y="314" class="fld k">source_id</text>
+  <text x="332" y="330" class="fld">text</text>
+  <text x="332" y="346" class="fld">embedding  vector</text>
+  <text x="332" y="362" class="fld">model_name</text>
+
+  <!-- environments: 2 fields, h=68 -->
+  <rect x="610" y="240" width="210" height="68" rx="5" class="box"/>
+  <path d="M610,266 V245 Q610,240 615,240 H815 Q820,240 820,245 V266 Z" class="hdr"/>
+  <text x="622" y="258" class="tname">environments</text>
+  <text x="622" y="282" class="fld k">id  PK</text>
+  <text x="622" y="298" class="fld">name  PD1 PD2 MPR1 MPR2</text>
+
+  <!-- snapshots: 5 fields -->
+  <rect x="880" y="240" width="190" height="116" rx="5" class="box"/>
+  <path d="M880,266 V245 Q880,240 885,240 H1065 Q1070,240 1070,245 V266 Z" class="hdr"/>
+  <text x="892" y="258" class="tname">snapshots</text>
+  <text x="892" y="282" class="fld k">id  PK</text>
+  <text x="892" y="298" class="fld k">environment_id  FK</text>
+  <text x="892" y="314" class="fld">name</text>
+  <text x="892" y="330" class="fld k">applied_by  FK</text>
+  <text x="892" y="346" class="fld">applied_at</text>
+
+  <!-- relations -->
+  <line x1="240" y1="80" x2="318" y2="80" class="edge" marker-end="url(#d-a)"/>
+  <text x="279" y="72" text-anchor="middle" class="lbl">1 : 1</text>
+  <line x1="530" y1="80" x2="608" y2="80" class="edge" marker-end="url(#d-a)"/>
+  <text x="569" y="72" text-anchor="middle" class="lbl">1 : up to 6</text>
+  <line x1="135" y1="194" x2="135" y2="238" class="edge" marker-end="url(#d-a)"/>
+  <text x="143" y="220" class="lbl">many : 1</text>
+  <line x1="425" y1="240" x2="425" y2="180" class="edge" marker-end="url(#d-a)"/>
+  <text x="433" y="214" class="lbl">source_id</text>
+  <line x1="820" y1="275" x2="878" y2="275" class="edge" marker-end="url(#d-a)"/>
+  <text x="849" y="267" text-anchor="middle" class="lbl">1 : many</text>
+  <line x1="975" y1="146" x2="975" y2="238" class="edge" marker-end="url(#d-a)"/>
+  <text x="983" y="196" class="lbl">applied_by</text>
+</svg>
+    </div>
+    <figcaption>
+      <span><strong>Draft schema, to be confirmed against docs/PRD.md.</strong> Vectors sit in the same database as the incidents, so a search can filter by date, project or resolver in one query.</span>
+      <ul>
+        <li>RCA sections are stored as JSON shaped by the Pydantic template, so the six sections can't drift.</li>
+        <li>Every chunk records which embedding model made it.</li>
+        <li>Not shown: tools, tool_folders, uploads and connection status tables.</li>
+      </ul>
+    </figcaption>
+  </figure>
+</section>
+
+<footer>GEV System Delivery · architecture drawings · draft, 8 October 2026 · reasoning for each choice is in docs/adr/</footer>
+</div>
+
+</body></html>
