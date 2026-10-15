@@ -1,4 +1,4 @@
-# Embed agent
+# Embed job
 
 **Purpose:** Chunk incident and RCA text and convert each chunk to a vector with an embedding model, then store the vectors in pgvector.
 

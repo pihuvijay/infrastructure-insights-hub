@@ -6,9 +6,9 @@
 
 Last updated: 2026-10-08. Nothing here is built yet. Experiment 4.3 in `docs/build-plan.md` tests a tiny version with Ollama.
 
-## RAG is built before agents
+## RAG is built before the Advisor
 
-Every agent depends on retrieval, so the RAG layer (load, chunk, embed, store, search) is built and tested on its own first, with eval questions measuring whether the right incidents come back. Only then are agents built on top.
+The Advisor and the embedding job depend on retrieval, so the RAG layer (load, chunk, embed, store, search) is built and tested on its own first, with eval questions measuring whether the right incidents come back. Only then are agents built on top.
 
 ## Ingestion and querying are separate
 

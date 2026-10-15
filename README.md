@@ -9,10 +9,10 @@
 
 ## How it works, end to end
 
-![Sources to insight: five agents](docs/assets/pipeline.svg)
+![Sources to insight: four background jobs and the Advisor agent](docs/assets/pipeline.svg)
 
 1. **Sync.** A background worker pulls resolved incidents from ServiceNow, RCA Word documents from Box and uploaded files into PostgreSQL. Pages never call ServiceNow or Box live.
-2. **Understand.** Five agents run in order: Ingest, Embed, Cluster, Impact, Advisor. Incidents are chunked, embedded into pgvector, grouped by root cause and costed in hours.
+2. **Understand.** Four background jobs run in order (Ingest, Embed, Cluster, Impact), then the Advisor agent takes over. Incidents are chunked, embedded into pgvector, grouped by root cause and costed in hours.
 3. **Show.** Insights shows recurring root causes and the hours a permanent fix would save. Search finds similar incidents and who fixed them.
 4. **Draft.** For an incident with no RCA, the Advisor drafts one in the team's exact template using retrieved incidents as context and a Llama 3.1 model with a LoRA adapter that has learned the RCA style.
 5. **Approve.** The engineer completes what only they know and approves. Only then is the `.docx` uploaded to Box, which feeds Search and Insights again.
@@ -26,9 +26,9 @@
 
 ## Results at a glance
 
-| UI pages | Agents | Endpoints in the contract | ADRs | RCA template sections | Internet needed for ticket data |
+| UI pages | Pipeline | Endpoints in the contract | ADRs | RCA template sections | Internet needed for ticket data |
 |---|---|---|---|---|---|
-| 8 plus build release | 5 | 18 route groups (`docs/PRD.md` §7) | 26+ | 6, never reordered | none, on-prem |
+| 8 plus build release | 4 jobs + 1 agent | 18 route groups (`docs/PRD.md` §7) | 26+ | 6, never reordered | none, on-prem |
 
 Model quality numbers do not exist yet, because nothing is trained or served. The evaluation plan and the table that will hold them are in [Fine-tuning](#fine-tuning-lora).
 
@@ -64,7 +64,7 @@ Model quality numbers do not exist yet, because nothing is trained or served. Th
 | Environments | `/environments` | PD1, PD2, MPR1, MPR2: snapshot, who applied it, when, up to date or stale, **Log latest**, **Notify manager** |
 | Tools | `/tools` | Links in folders (Admin, Training, Working, Location, Tools), search, **Export bookmarks** |
 | Build Release | `/build-release` | Progress trackers for PD1, PD2, MPR1 with a ticket page each |
-| RCA Insights | `/rca/insights` | Summary figures, five-agent strip, high-priority clusters, six interactive charts |
+| RCA Insights | `/rca/insights` | Summary figures, pipeline strip, high-priority clusters, six interactive charts |
 | Create RCA | `/rca/create` | Incident list with combined filters, **Edit RCA info**, **View Word**, **Edit Word**, **Upload to Box** |
 | RCA Search | `/rca` | Directed search with filters, related incidents with match score, follow-up chat |
 | Data sources | `/rca/upload` | Drop files, connect ServiceNow and Box, **Sync now**, **Disconnect** |
@@ -136,7 +136,7 @@ stateDiagram-v2
 |---|---|
 | Environments, Tools, Settings | Postgres |
 | Create RCA list | Postgres, synced from ServiceNow |
-| Insights | Postgres: clusters and impact written by the agents |
+| Insights | Postgres: clusters and impact written by the background jobs |
 | Search, agent sidebar, RCA draft | pgvector retrieval plus vLLM |
 
 Dashboards read only from Postgres and Redis, so they stay under the 500 ms target even when the reasoning plane is slow or down.
@@ -160,19 +160,26 @@ Dashboards read only from Postgres and Redis, so they stay under the 500 ms targ
 
 Request path: browser to Nginx (TLS, rate limit) to Next.js for pages and FastAPI under `/api/v1` for data, then a service reads Postgres, Redis or vLLM. Streamed answers use SSE. See `docs/architecture/high-level.md`.
 
-## The five agents
+## The data pipeline and the Advisor agent
 
-Agents are LangGraph nodes with typed state, a recursion limit, a timeout per node and bounded retries. State lets work loop back, branch, and pause for approval.
+There is **one agent: the Advisor**. It uses the LLM to reason, give advice and draft RCAs. Ingest, Embed, Cluster and Impact are **background jobs** in the worker, in plain Python with no LLM reasoning: fetching, embedding, a clustering algorithm and arithmetic. This is the project's own design, not an industry standard, recorded in [ADR 0032](docs/adr/0032-one-agent-and-background-jobs.md).
+
+The Advisor is what you talk to. In the UI, clicking any chart, cluster or the **Ask the agent** button opens the Advisor sidebar tagged with that item and its numbers, where you can ask follow-up questions and get explanations.
+
+Only the Advisor runs as a LangGraph graph, with typed state, a recursion limit, a timeout per node and bounded retries. LangGraph lets it loop back, branch, and pause for human approval.
 
 ```mermaid
 flowchart LR
-  Ingest --> Embed --> Cluster --> Impact --> Advisor
+  subgraph Jobs[Background jobs in the worker]
+    Ingest --> Embed --> Cluster --> Impact
+  end
+  Impact -->|stored in Postgres| Advisor
   Advisor -->|draft| Review{{Human review: interrupt}}
   Review -->|approved| Upload[Queue Box upload]
   Review -->|edits| Advisor
 ```
 
-| Agent | LLM? | What it does | Runs in | Writes |
+| Job or agent | LLM? | What it does | Runs in | Writes |
 |---|---|---|---|---|
 | Ingest | No | Fetches ServiceNow, Box and uploads and normalises them | Worker | Incidents, uploads, sync status |
 | Embed | Embedding model only | Chunks text, embeds it, stores vectors with model name and version | Worker | Chunks, embeddings |
@@ -180,7 +187,7 @@ flowchart LR
 | Impact | No | Hours spent and hours savable per cluster (formula TODO) | Worker | Cluster impact numbers |
 | Advisor | Yes, base + LoRA | Answers questions, powers Search and the sidebar, drafts RCAs | API, streamed over SSE | Draft RCA |
 
-Interactive agents (Advisor) run in the API and stream. Batch agents run in the worker from the Redis queue. Details per agent: `docs/architecture/agents/`.
+The Advisor runs in the API and streams over SSE. The four jobs run in the worker from the Redis queue. More detail: `docs/architecture/agents/`.
 
 ## RAG
 
@@ -496,34 +503,58 @@ async def search(
 
 Publishing an RCA works the same way, with a `report` JSON part and the `.docx` as `file`.
 
-### Example 4: streamed agent answer
+### Example 4: streamed agent answer (SSE)
 
-`POST /agent/chat` returns text as it is generated. `streamChat` in `src/lib/api.ts` reads the body in chunks and the sidebar shows each piece:
+`POST /agent/chat` streams the answer as Server-Sent Events ([ADR 0004](docs/adr/0004-sse-over-websockets.md), [streaming](docs/architecture/streaming.md)). Each event ends with a blank line:
 
-```ts
-const res = await fetch(`${BASE}/agent/chat`, { method: "POST", body: JSON.stringify({...}), signal });
-const reader = res.body.getReader();
-for (;;) {
-  const { done, value } = await reader.read();
-  if (done) return;
-  yield dec.decode(value, { stream: true });
-}
+```
+: ping
+
+data: "The "
+
+data: "likely cause is "
+
+event: done
+data: {}
+
 ```
 
-Planned backend side, as Server-Sent Events ([ADR 0004](docs/adr/0004-sse-over-websockets.md)):
+`EventSource` cannot send a POST body, so `streamChat` in `src/lib/api.ts` uses `fetch` and parses the events. It is an async generator, and the sidebar iterates it:
+
+```ts
+for await (const e of sseEvents(res.body)) {
+  if (e.event === "done") return;
+  if (e.event === "error") throw new Error((JSON.parse(e.data) as { message: string }).message);
+  yield JSON.parse(e.data) as string;
+}
+throw new Error("Stream ended unexpectedly");
+```
+
+Tokens are JSON-encoded so newlines and quotes survive. A stream that closes without `done` is an error, never a finished answer. The Stop button aborts the `fetch` with its `AbortSignal`.
+
+Backend side (example, not built yet):
 
 ```python
+import json
+from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 @router.post("/agent/chat")
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, request: Request):
     async def events():
-        async for token in advisor.stream(req):
-            yield f"data: {token}\n\n"
-    return StreamingResponse(events(), media_type="text/event-stream")
+        try:
+            async for token in advisor.stream(req):
+                if await request.is_disconnected():
+                    return
+                yield f"data: {json.dumps(token)}\n\n"
+            yield "event: done\ndata: {}\n\n"
+        except Exception:
+            yield 'event: error\ndata: {"message": "AI unavailable"}\n\n'
+    return StreamingResponse(events(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 ```
 
-The Stop button aborts the `fetch` with its `AbortSignal`, and the server cancels the run when the client disconnects. The frontend currently reads plain text chunks, so moving to the SSE event format is a change to `streamChat` too ([streaming](docs/architecture/streaming.md)).
+`X-Accel-Buffering: no` and a long read timeout in Nginx stop the proxy from holding the stream back.
 
 ### Switching an endpoint from mock to live
 
@@ -588,7 +619,8 @@ Full sequence diagrams: `docs/architecture/flows.md`.
 | On-prem VMs, ticket data stays on the network | 0002 |
 | Vectors in Postgres with pgvector | 0005 |
 | Redis for queue, cache, agent state | 0006 |
-| LangGraph agents with limits and timeouts | 0007 |
+| LangGraph for the Advisor, with limits and timeouts | 0007 |
+| One agent (Advisor); the other four steps are background jobs | 0032 |
 | vLLM on the GPU server, Ollama locally | 0008, 0023 |
 | RAG for knowledge | 0009 |
 | LoRA for RCA template and style, behind an eval gate | 0031 |
@@ -730,7 +762,7 @@ Tests never call a real LLM except the evals. The staging image that passes is t
 - [ ] FastAPI skeleton, `/health`, Alembic migrations and the pgvector tables
 - [ ] ServiceNow and Box integrations with limiters and circuit breakers
 - [ ] RAG ingestion and retrieval, with about 30 evals
-- [ ] vLLM on the GPU server and the five LangGraph agents
+- [ ] vLLM on the GPU server and the four background jobs and the LangGraph Advisor agent
 - [ ] Export approved RCAs to `rcas.jsonl`, train the LoRA adapter, compare against base, serve with `--enable-lora`
 - [ ] Switch `src/lib/api.ts` from mock to live, one endpoint at a time
 - [ ] Authentication, once IT confirms the method
@@ -744,7 +776,7 @@ Tests never call a real LLM except the evals. The staging image that passes is t
 
 **Who writes the RCA?** The agent drafts what ServiceNow can answer. The engineer completes what only they know and approves.
 
-**How are patterns found?** Incidents are embedded and clustered by root cause. The Impact agent adds up hours spent and hours a permanent fix would save.
+**How are patterns found?** Incidents are embedded and clustered by root cause. The Impact job adds up hours spent and hours a permanent fix would save.
 
 **Why LoRA and RAG?** RAG gives the model the team's incidents at question time and stays current. LoRA teaches it the RCA template and tone. One does not replace the other.
 

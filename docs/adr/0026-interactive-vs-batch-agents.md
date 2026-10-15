@@ -1,5 +1,5 @@
 # ADR 0026: Interactive agents in the API, batch agents in the worker
-Status: Accepted
+Status: Accepted ("batch agents" wording superseded by ADR 0032: the four batch steps are background jobs)
 Date: 2026-10-08
 Related docs: [agents](../architecture/agents/README.md), [background-jobs](../architecture/background-jobs.md), [streaming](../architecture/streaming.md), [flows](../architecture/flows.md)
 

@@ -66,7 +66,7 @@ The background worker is a separate process from the same codebase. It takes job
 | Plane | What lives there | Why separate |
 |---|---|---|
 | Presentation | Browser, Nginx, Next.js | Changes with design. Never holds credentials. |
-| Reasoning | FastAPI services, LangGraph agents, worker, vLLM | The slow, variable-latency, failure-prone part (LLM calls, external APIs). |
+| Reasoning | FastAPI services, LangGraph Advisor, worker jobs, vLLM | The slow, variable-latency, failure-prone part (LLM calls, external APIs). |
 | Data | PostgreSQL + pgvector, Redis | Durable and fast. Dashboards read only from here, so they stay under 500 ms even when the reasoning plane is slow or down. |
 
 The separation is what lets the dashboard keep working when ServiceNow, Box or the GPU server is down ([resilience](resilience.md)).
@@ -84,7 +84,7 @@ flowchart LR
   Advisor --> Create[Create RCA drafts]
 ```
 
-The five agents are described in [agents/README.md](agents/README.md). Not every agent uses an LLM.
+Four background jobs and one agent (the Advisor) are described in [agents/README.md](agents/README.md). Only the Advisor uses the LLM to reason.
 
 ## Where each page reads from
 
@@ -92,7 +92,7 @@ The five agents are described in [agents/README.md](agents/README.md). Not every
 |---|---|
 | Environments, Tools, Settings | Postgres (non-AI, fast) |
 | Create RCA list | Postgres (synced from ServiceNow) |
-| Insights | Postgres (clusters and impact produced by agents) |
+| Insights | Postgres (clusters and impact produced by background jobs) |
 | Search, Agent sidebar, RCA draft | pgvector retrieval plus vLLM |
 
 See [frontend.md](frontend.md) for the endpoint mapping.

@@ -55,3 +55,4 @@ Related docs: links
 | [0025](0025-observability.md) | Observability with structured logs, OpenTelemetry and agent tracing | Accepted |
 | [0026](0026-interactive-vs-batch-agents.md) | Interactive agents in the API, batch agents in the worker | Accepted |
 | [0031](0031-lora-for-rca-style.md) | LoRA fine-tuning for RCA template and style, alongside RAG | Accepted |
+| [0032](0032-one-agent-and-background-jobs.md) | One agent (the Advisor); Ingest, Embed, Cluster and Impact are background jobs | Accepted |

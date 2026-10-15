@@ -16,7 +16,7 @@ Service delivery engineers, their line manager (wants to be told when a snapshot
 ## 3. Stack (fixed)
 
 - Frontend: **Next.js 15 App Router**, React 19, TypeScript strict, Tailwind v4, shadcn/ui (`src/components/ui`), TanStack Query, Recharts, lucide-react, sonner.
-- Backend: **FastAPI** (not built yet). Agents: **LangGraph** (Ingest → Embed → Cluster → Impact → Advisor). Retrieval: **RAG**.
+- Backend: **FastAPI** (not built yet). Agent: **LangGraph** Advisor, fed by background jobs (Ingest → Embed → Cluster → Impact). Retrieval: **RAG**.
 - Until the backend exists the UI runs on mock data (`NEXT_PUBLIC_API_MODE=mock`). Switching to `live` must need no UI changes — only `src/lib/api.ts` talks to the network.
 - Not allowed: TanStack Start/Router, Vite, Lovable APIs, Supabase.
 
@@ -120,7 +120,7 @@ Exported as `.docx` with these headings in this order. Do not rename or reorder 
 | POST            | /rca/reports/{number}/publish             | multipart `report` + `file` (.docx) → upload to Box → `{fileName, boxUrl}`       |
 | GET/POST/DELETE | /rca/connections[/{id}/connect\|sync]     | ServiceNow / Box connections                                                     |
 | GET/POST        | /rca/uploads                              | file uploads                                                                     |
-| POST            | /agent/chat                               | `{messages, clusterId, incidentIds, focus}` → streamed text                      |
+| POST            | /agent/chat                               | `{messages, clusterId, incidentIds, focus}` → SSE stream (`text/event-stream`, see docs/architecture/streaming.md)                      |
 
 Types are in `src/lib/types.ts` and are the contract. Change them together with this table.
 

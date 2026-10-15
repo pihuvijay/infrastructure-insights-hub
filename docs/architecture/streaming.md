@@ -28,7 +28,18 @@ Correction: the "WebSocket memory overhead" argument applies equally to SSE, sin
 
 The route returns a streaming response with media type `text/event-stream`, iterating an async generator that yields chunks as the agent produces them. Rules: set a heartbeat if the stream may be idle, detect client disconnect, cancel the agent work on disconnect, and end with a clear final event. Use the skill `new-streaming-endpoint`. No code is written yet.
 
-Today the frontend reads `/api/v1/agent/chat` as a raw byte stream (`streamChat` in `src/lib/api.ts`, using `res.body.getReader()` and an `AbortSignal`). The backend must emit a format that this function can read, or `streamChat` must be updated together with the PRD. TODO: decide plain text chunks vs `text/event-stream` framing before building.
+### Wire format (decided 2026-10-15)
+
+`POST /api/v1/agent/chat` responds with `Content-Type: text/event-stream`. The browser cannot use `EventSource` for a POST with a body, so `streamChat` in `src/lib/api.ts` reads the response with `fetch` and parses the events itself (`sseEvents`). Each event ends with a blank line:
+
+| Event | Wire form | Meaning |
+|---|---|---|
+| token | `data: "<JSON string>"` | The next piece of text. JSON-encoded so newlines and quotes in the token are safe |
+| done | `event: done` then `data: {}` | The answer is complete |
+| error | `event: error` then `data: {"message": "..."}` | The run failed; the UI shows the message |
+| heartbeat | `: ping` | A comment line sent while idle; the client ignores it |
+
+If the stream closes without a `done` event, `streamChat` throws "Stream ended unexpectedly" so a cut-off answer is never shown as complete. Stop still aborts the `fetch` with its `AbortSignal`. In mock mode `mockChat` yields the same strings directly, so the sidebar code is unchanged.
 
 ## Frontend hook pattern
 

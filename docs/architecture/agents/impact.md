@@ -1,4 +1,4 @@
-# Impact agent
+# Impact job
 
 **Purpose:** Estimate hours spent per cluster and the hours a permanent fix would save.
 

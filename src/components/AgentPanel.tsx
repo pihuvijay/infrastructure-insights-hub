@@ -48,7 +48,7 @@ export function AgentPanel() {
           <div className="text-sm font-semibold">Advisor agent</div>
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <span className="size-1.5 rounded-full bg-primary" />
-            Pipeline live · 5 agents
+            Pipeline live · 4 jobs + Advisor
           </div>
         </div>
         <button

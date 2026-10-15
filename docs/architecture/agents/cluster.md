@@ -1,4 +1,4 @@
-# Cluster agent
+# Cluster job
 
 **Purpose:** Group incidents by root cause so recurring problems become visible.
 

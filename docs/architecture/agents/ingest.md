@@ -1,4 +1,4 @@
-# Ingest agent
+# Ingest job
 
 **Purpose:** Pull ServiceNow incidents, Box RCA Word documents and uploaded files (historical spreadsheet, logs, post-mortems) into Postgres in a normalised shape.
 
