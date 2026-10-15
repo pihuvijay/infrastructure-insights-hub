@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" font-family="Helvetica,Arial,sans-serif">
+<style>
+.b{fill:#0b0b0b;stroke:#2dd4bf;stroke-width:1.5}.t{fill:#e5e5e5;font-size:13px;text-anchor:middle}.s{fill:#8a8a8a;font-size:10.5px;text-anchor:middle}.h{fill:#2dd4bf;font-size:12px}
+.l{stroke:#005f61;stroke-width:2;fill:none;stroke-dasharray:6 6;animation:d 1.2s linear infinite}@keyframes d{to{stroke-dashoffset:-12}}
+.a{animation:p 16s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35}6%{opacity:1}12%{opacity:.35}}
+.c{fill:#005f61;stroke:#2dd4bf;stroke-width:1}
+</style>
+<rect width="1000" height="440" fill="#000" rx="14"/>
+<text x="500" y="26" class="t" style="font-size:18px">RAG, step by step</text>
+<text x="20" y="54" class="h">Setup: background jobs, run continuously</text>
+<rect x="20" y="66" width="200" height="100" rx="10" class="b a"/><text x="120" y="88" class="t">1. Load</text>
+<text x="120" y="108" class="s">ServiceNow incidents</text><text x="120" y="123" class="s">Box RCA documents</text><text x="120" y="138" class="s">uploaded files</text>
+<rect x="260" y="66" width="230" height="100" rx="10" class="b a" style="animation-delay:2s"/><text x="375" y="88" class="t">2. Chunk</text>
+<rect x="280" y="100" width="55" height="22" rx="4" class="c"/><rect x="325" y="118" width="55" height="22" rx="4" class="c" opacity=".8"/><rect x="370" y="100" width="55" height="22" rx="4" class="c"/><rect x="415" y="118" width="55" height="22" rx="4" class="c" opacity=".8"/>
+<text x="375" y="156" class="s">small pieces, overlapping, each linked to its source</text>
+<rect x="530" y="66" width="200" height="100" rx="10" class="b a" style="animation-delay:4s"/><text x="630" y="88" class="t">3. Embed</text>
+<text x="630" y="112" class="s">embedding model</text><text x="630" y="130" class="s" style="fill:#2dd4bf">[0.12, -0.03, 0.88, ...]</text><text x="630" y="148" class="s">similar meaning, similar numbers</text>
+<rect x="770" y="66" width="210" height="100" rx="10" class="b a" style="animation-delay:6s"/><text x="875" y="88" class="t">4. Store</text>
+<text x="875" y="112" class="s">PostgreSQL + pgvector</text><text x="875" y="130" class="s">text + vector + model name</text><text x="875" y="148" class="s">HNSW index</text>
+<path class="l" d="M220 116H260M490 116H530M730 116H770"/>
+<text x="20" y="226" class="h">Answering: runs when a user asks</text>
+<rect x="20" y="238" width="200" height="100" rx="10" class="b a" style="animation-delay:8s"/><text x="120" y="260" class="t">5. Embed question</text>
+<text x="120" y="284" class="s">same embedding model</text><text x="120" y="302" class="s">question becomes a vector</text>
+<rect x="260" y="238" width="230" height="100" rx="10" class="b a" style="animation-delay:10s"/><text x="375" y="260" class="t">6. Retrieve</text>
+<text x="375" y="284" class="s">nearest vectors + SQL filters</text><text x="375" y="302" class="s">date, project, source, status</text><text x="375" y="320" class="s">top chunks with match score</text>
+<rect x="530" y="238" width="200" height="100" rx="10" class="b a" style="animation-delay:12s"/><text x="630" y="260" class="t">7. Assemble prompt</text>
+<text x="630" y="284" class="s">instructions + question</text><text x="630" y="302" class="s">tagged context + chunks</text>
+<rect x="770" y="238" width="210" height="100" rx="10" class="b a" style="animation-delay:14s"/><text x="875" y="260" class="t">8. Generate</text>
+<text x="875" y="284" class="s">chat LLM (Llama 3.1, vLLM)</text><text x="875" y="302" class="s">answer citing incidents</text><text x="875" y="320" class="s">or a drafted RCA</text>
+<path class="l" d="M220 288H260M490 288H530M730 288H770"/>
+<path class="l" d="M875 166 V200 H375 V238" style="stroke-dasharray:3 5"/>
+<text x="625" y="196" class="s">stored vectors are searched at step 6</text>
+<text x="500" y="378" class="s">Steps 1-4 are the Ingest and Embed jobs. Steps 5-8 are the Advisor agent.</text>
+<text x="500" y="398" class="s">If step 6 returns the wrong chunks, no LLM can fix the answer, so retrieval is built and evaluated first.</text>
+<circle r="5" fill="#2dd4bf"><animateMotion dur="16s" repeatCount="indefinite" path="M20 116 L875 116 L875 200 L120 200 L120 288 L875 288"/></circle>
+</svg>

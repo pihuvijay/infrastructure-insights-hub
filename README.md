@@ -191,16 +191,87 @@ The Advisor runs in the API and streams over SSE. The four jobs run in the worke
 
 ## RAG
 
-```mermaid
-flowchart TB
-  subgraph Ingestion[Ingestion: continuous background jobs]
-    L[Load: ServiceNow, Box, uploads] --> C[Chunk] --> E[Embed with fixed model] --> S[(pgvector: model name and version stored)]
-  end
-  subgraph Query[Query time]
-    Q[Question] --> QE[Embed question, same model] --> R[Vector similarity + SQL filters] --> P[Assemble prompt] --> M[LLM answers, citing incidents]
-  end
-  S --> R
+![RAG, step by step](docs/assets/rag-steps.svg)
+
+RAG (retrieval-augmented generation) turns past incidents into something searchable, then gives the best matches to the LLM so it answers from the team's own history.
+
+### Setup: background jobs
+
+1. **Load.** Collect raw text: ServiceNow descriptions, work notes and resolution comments, RCA Word documents from Box, and uploaded files.
+2. **Chunk.** Split the text into small pieces. A model cannot search a 20-page RCA well, and one vector for a whole document blurs everything together.
+   - Each chunk keeps a pointer to its source, for example "incident INC0012345" or "RCA for PRB0045, Root Cause section".
+   - Neighbouring chunks **overlap** by a few sentences, so an idea cut at a boundary is not lost.
+   - Size matters: too big and the match is vague, too small and a chunk loses context ("restarted the service" means nothing without knowing which one).
+   - Chunk size and overlap are TODO, tuned with evals.
+3. **Embed.** An embedding model turns each chunk into a vector, a list of numbers. Similar meaning gives similar numbers, so "DB connections exhausted" and "connection pool full" land close together even though the words differ.
+4. **Store.** Save the text, the vector and the embedding model name and version in PostgreSQL with pgvector. Vectors from different models cannot be compared.
+
+### Answering: when a user asks
+
+5. **Embed the question** with the same embedding model.
+6. **Retrieve.** Postgres finds the nearest vectors and applies SQL filters in the same query (date, project, source, status, resolver). The top chunks come back with a match score, which is the score shown in the Search UI.
+7. **Assemble the prompt** from the instructions, the question, the tagged context (cluster, chart numbers) and the retrieved chunks.
+8. **Generate.** The chat LLM answers from that material and cites the incidents it used. For an RCA draft the output is forced into the template.
+
+### After retrieval: where the LLM comes in
+
+![After retrieval: prompt, LLM, answer](docs/assets/rag-generate.svg)
+
+Retrieval returns raw material: the top chunks, each with its text, its source incident or RCA and a match score. Nobody has read or compared them yet. The LLM turns them into an answer.
+
+**Step 7, assemble the prompt (plain code, no LLM).** The backend glues one block of text together:
+
 ```
+SYSTEM:   You are the Advisor. Answer only from the incidents below.
+          Cite incident numbers. If they do not answer it, say so.
+
+CONTEXT:  [INC001, resolved by Sam, 4h] Login failed after patch; cert expired...
+          [INC014, resolved by Priya, 6h] SSO outage after patch window; cert...
+          [INC022, ...] ...
+
+TAGGED:   cluster "Expired certificates", 14 incidents, 52 hours (from the Impact job)
+
+QUESTION: Why does login keep failing after patching?
+```
+
+**Step 8, generate.** vLLM runs Llama 3.1 with the LoRA adapter on that prompt and streams the answer back over SSE. The LLM adds what search cannot:
+
+- It **summarises** several chunks into one answer.
+- It **spots the pattern** across incidents.
+- It **phrases** the answer for the question, and for an RCA draft it fills the template sections.
+- It **cites** the incidents, so the UI can show them beside the answer.
+
+**What happens next.** For Ask and Search, the answer appears with the related incidents and match scores beside it, and a follow-up question repeats the loop with the conversation history added. For an RCA draft, the draft is saved as Draft, the engineer edits and approves it, and only then is it uploaded to Box.
+
+**Limits.** The LLM sees only the retrieved chunks, so missed incidents mean a wrong or generic answer. The "answer only from the context, cite sources, say if unsure" instruction reduces invented answers, and evals should check that every cited incident exists. Hours come from the stored Impact values, never from the LLM. The Advisor is not built yet; in the UI today its answers are scripted.
+
+**Example.** Question: "Why does login keep failing after patching?" The question becomes a vector, pgvector returns chunks from three earlier incidents about certificate expiry after patch windows, those chunks go into the prompt, and the LLM answers that this looks like the recurring expired-certificate issue, seen in those incidents and fixed by renewing the certificate.
+
+### Which model does what
+
+| Step | Model needed |
+|---|---|
+| Chunk, store, search pgvector | None |
+| Embed chunks and the question | Embedding model (candidate `nomic-embed-text`) |
+| Write the answer or RCA draft | Chat LLM (Llama 3.1 with the LoRA adapter) |
+
+Retrieval needs only the embedding model, so it can be built and tested first, even on a laptop with Ollama. Search results and match scores work without the chat LLM. Answers, "suggest a fix" and RCA drafts need it.
+
+If step 6 returns the wrong chunks, no LLM can rescue the answer, so retrieval is built and evaluated first, with about 30 eval questions that check the right incidents come back.
+
+### pgvector
+
+pgvector is a **PostgreSQL extension**, not a Python library. `CREATE EXTENSION vector;` adds a `vector` column type and similarity search in SQL, so vectors and filters work in one query. A separate Python helper package of the same name only lets SQLAlchemy read and write that column.
+
+```sql
+SELECT id, content
+FROM chunks JOIN embeddings USING (id)
+WHERE project = 'PD1' AND opened > '2026-01-01'
+ORDER BY embedding <=> '[0.12, -0.03, ...]'   -- cosine distance, smaller is closer
+LIMIT 5;
+```
+
+### Rules
 
 - The **same embedding model** is used for ingestion and queries in every environment. Changing it means re-embedding everything. Candidate: `nomic-embed-text` (TODO after evals).
 - Retrieval combines vector similarity with ordinary SQL filters in one query (date, project, source, status, resolver), using an HNSW index.
