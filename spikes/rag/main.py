@@ -1,4 +1,5 @@
 import argparse
+import uuid
 
 from data import INCIDENTS
 from graph import ask, build_graph
@@ -25,19 +26,33 @@ def main() -> None:
 
     app = build_graph(get_store(a.rebuild))
     filters = {k: v for k, v in {"project": a.project, "status": a.status}.items() if v}
+    thread = str(uuid.uuid4())
 
-    def run(q: str) -> None:
-        r = ask(app, q, filters)
-        print(f"\nsearch query used : {r['query']}  (attempts: {r['attempts']})")
-        for h in r["hits"]:
-            print(f"  {h['score']:.2f}  {h['incident_id']}  {h['root_cause']}")
+    def run(q: str) -> list[str]:
+        r = ask(app, q, thread, filters)
+        print(f"\nroute: {r.get('route', 'search')}   query: {r.get('query', q)}")
+        for h in r.get("hits", []):
+            print(f"  {h['incident_id']}  {h['root_cause']}  ({h['resolved_by'] or 'open'}, {h['hours_spent']}h)")
         print(f"\n{r['answer']}\n")
+        for i, f in enumerate(r.get("followups", []), 1):
+            print(f"  {i}. {f}")
+        return r.get("followups", [])
 
     if a.question:
         run(a.question)
-    else:
-        while q := input("ask> ").strip():
-            run(q)
+        return
+    followups: list[str] = []
+    while True:
+        try:
+            q = input("\nask (number picks a suggestion, empty quits)> ").strip()
+        except EOFError:
+            break
+        if not q:
+            break
+        if q.isdigit() and 0 < int(q) <= len(followups):
+            q = followups[int(q) - 1]
+            print(f"> {q}")
+        followups = run(q)
 
 
 if __name__ == "__main__":

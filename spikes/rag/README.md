@@ -27,7 +27,7 @@ export CHAT_MODEL=llama3.2:3b      # default is llama3.1:8b
 | `vector.py` | Embed, store in the Postgres table `spike_chunks` (pgvector, HNSW index), search with SQL filters |
 | `graph.py` | LangGraph: retrieve, then answer, rewrite the query, or give up |
 | `main.py` | Command line |
-| `evals.py` | Does the right incident come back? |
+| `evals.py` | Retrieval check (right incident first?) and a 5-turn follow-up conversation check |
 | `config.py` | Models and thresholds |
 
 ## The graph
@@ -53,3 +53,15 @@ RAG has to find the incidents closest in meaning to a question. Plain Postgres c
 `pgvector` only covers the store and retrieve stages. Embedding is done by the embedding model, answers by the LLM, and chunking and prompts by our code.
 
 This spike uses it already: `vector.py` creates the extension, a `spike_chunks` table with a `vector(768)` column and an HNSW index, and searches with `<=>`. Re-embed with `main.py --rebuild`. The table is cleared and refilled each rebuild; the data lives in the Docker volume `gev_postgres_data`.
+
+## Follow-up questions
+
+The graph keeps the conversation (LangGraph `MemorySaver`, one thread per session) and routes each message:
+
+| Route | For | What happens |
+|---|---|---|
+| `search` | New topic, "other" or "earlier" incidents | Retrieve from pgvector |
+| `context` | "What was the fix?" | Reuse the incidents already retrieved |
+| `lookup` | Who, when, how long, how big | Read exact `resolved_by`, `resolved_date`, `hours_spent` from the table, add total/average/min/max hours, then answer |
+
+After each answer the model suggests 3 follow-up questions; type 1, 2 or 3 to pick one. Names, dates and hours come from the table, not from the model's memory.

@@ -21,6 +21,8 @@ def to_chunks(incidents: list[dict]) -> list[dict]:
             "status": inc["status"],
             "resolved_by": inc["resolved_by"],
             "root_cause": inc["root_cause"],
+            "resolved_date": inc["resolved_date"],
+            "hours_spent": inc["hours_spent"],
             "text": piece,
         }
         for inc in incidents

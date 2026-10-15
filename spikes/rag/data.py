@@ -1,6 +1,8 @@
 INCIDENTS = [
     {
         "id": "INC0001",
+        "resolved_date": "2026-03-14",
+        "hours_spent": 6.5,
         "project": "PD1",
         "status": "Resolved",
         "resolved_by": "Priya",
@@ -9,6 +11,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0002",
+        "resolved_date": "2026-04-02",
+        "hours_spent": 12.0,
         "project": "PD2",
         "status": "Resolved",
         "resolved_by": "Marcus",
@@ -17,6 +21,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0003",
+        "resolved_date": "2026-04-20",
+        "hours_spent": 4.0,
         "project": "MPR1",
         "status": "Resolved",
         "resolved_by": "Priya",
@@ -25,6 +31,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0004",
+        "resolved_date": "2026-05-11",
+        "hours_spent": 8.0,
         "project": "PD1",
         "status": "Resolved",
         "resolved_by": "Aisha",
@@ -33,6 +41,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0005",
+        "resolved_date": "2026-06-03",
+        "hours_spent": 16.0,
         "project": "MPR2",
         "status": "Resolved",
         "resolved_by": "Marcus",
@@ -41,6 +51,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0006",
+        "resolved_date": "2026-06-25",
+        "hours_spent": 5.5,
         "project": "PD2",
         "status": "Resolved",
         "resolved_by": "Aisha",
@@ -49,6 +61,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0007",
+        "resolved_date": None,
+        "hours_spent": 3.0,
         "project": "PD1",
         "status": "Open",
         "resolved_by": "",
@@ -57,6 +71,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0008",
+        "resolved_date": "2026-07-19",
+        "hours_spent": 3.0,
         "project": "MPR1",
         "status": "Resolved",
         "resolved_by": "Priya",
@@ -65,6 +81,8 @@ INCIDENTS = [
     },
     {
         "id": "INC0009",
+        "resolved_date": "2026-08-08",
+        "hours_spent": 2.5,
         "project": "PD2",
         "status": "Resolved",
         "resolved_by": "Marcus",
@@ -73,10 +91,22 @@ INCIDENTS = [
     },
     {
         "id": "INC0010",
+        "resolved_date": "2026-09-02",
+        "hours_spent": 9.0,
         "project": "MPR2",
         "status": "Resolved",
         "resolved_by": "Aisha",
         "root_cause": "Failed database migration",
         "text": "The application would not start after a deploy. Startup logs showed a missing column error. Work notes: a database migration failed halfway and was not rolled back. Resolution: restored from backup, fixed the migration script and re-ran it.",
+    },
+    {
+        "id": "INC0011",
+        "resolved_date": "2026-09-21",
+        "hours_spent": 4.0,
+        "project": "MPR2",
+        "status": "Resolved",
+        "resolved_by": "Aisha",
+        "root_cause": "Expired TLS certificate",
+        "text": "Partner integrations started failing with SSL handshake errors. Work notes: the TLS certificate on the API gateway expired, the same cause as an earlier portal outage. Resolution: renewed the certificate and enabled automatic renewal.",
     },
 ]
