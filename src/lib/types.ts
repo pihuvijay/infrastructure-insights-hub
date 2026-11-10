@@ -125,6 +125,7 @@ export interface ChatContext {
   clusterId: string | null;
   incidentIds: string[];
   focus?: AgentFocus | null;
+  mode?: "pipeline" | "agent";
 }
 
 export type RcaStatus = "none" | "draft" | "published";

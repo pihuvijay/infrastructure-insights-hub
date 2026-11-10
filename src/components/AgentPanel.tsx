@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bot, X, ArrowUp, Square, Tag } from "lucide-react";
-import { useAgent, ask, closeAgent, stopAgent, openAgent } from "@/lib/agent-store";
+import { useAgent, ask, closeAgent, stopAgent, openAgent, setAgentMode } from "@/lib/agent-store";
 import { cn } from "@/lib/utils";
 
 const GENERAL = [
@@ -18,7 +18,7 @@ const CLUSTER_Q = [
 ];
 
 export function AgentPanel() {
-  const { open, cluster, focus, messages, busy, error } = useAgent();
+  const { open, cluster, focus, mode, messages, busy, error } = useAgent();
   const [text, setText] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -59,6 +59,29 @@ export function AgentPanel() {
           <X className="size-4" />
         </button>
       </header>
+
+      <div
+        className="flex items-center gap-2 border-b px-4 py-2"
+        role="group"
+        aria-label="Advisor mode"
+      >
+        {(["pipeline", "agent"] as const).map((m) => (
+          <button
+            key={m}
+            disabled={busy}
+            onClick={() => setAgentMode(m)}
+            aria-pressed={mode === m}
+            className={cn(
+              "rounded-md px-2 py-0.5 text-[11px]",
+              mode === m
+                ? "bg-primary-soft text-primary"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {m === "pipeline" ? "Fixed steps" : "Autonomous"}
+          </button>
+        ))}
+      </div>
 
       {tagged && (
         <div className="border-b px-4 py-3">

@@ -142,6 +142,7 @@ export async function* streamChat(
       clusterId: ctx.clusterId,
       incidentIds: ctx.incidentIds,
       focus: ctx.focus ?? null,
+      mode: ctx.mode ?? "pipeline",
     }),
     signal,
   });

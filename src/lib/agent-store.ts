@@ -9,6 +9,7 @@ type State = {
   cluster: Cluster | null;
   focus: AgentFocus | null;
   incidentIds: string[];
+  mode: "pipeline" | "agent";
   messages: ChatMsg[];
   busy: boolean;
   error: string | null;
@@ -19,6 +20,7 @@ let state: State = {
   cluster: null,
   focus: null,
   incidentIds: [],
+  mode: "pipeline",
   messages: [],
   busy: false,
   error: null,
@@ -56,6 +58,7 @@ export function openAgent(cluster: Cluster | null, firstQuestion?: string, focus
   else if (focus) void ask(`What stands out about "${focus.label}" and what should we do?`);
   else if (cluster) void ask(`Brief me on the "${cluster.name}" cluster.`);
 }
+export const setAgentMode = (mode: State["mode"]) => set({ mode });
 export const closeAgent = () => {
   controller?.abort();
   set({ open: false, busy: false });
@@ -74,6 +77,7 @@ export async function ask(text: string) {
     clusterId: state.cluster?.id ?? null,
     incidentIds: state.incidentIds,
     focus: state.focus,
+    mode: state.mode,
   };
   try {
     let out = "";
